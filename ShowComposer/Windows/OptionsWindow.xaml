@@ -1,0 +1,27 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="ShowComposer.Windows.OptionsWindow"
+        Title="Options" Height="465" Width="335.138" Loaded="Window_Loaded" Closed="Window_Closed">
+    <Grid>
+        <GroupBox Header="Video Options" HorizontalAlignment="Left" Margin="10,186,0,0" VerticalAlignment="Top" Height="140" Width="301">
+            <Grid>
+                <ComboBox x:Name="comboBoxVideoDevice" SelectedIndex="1" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="240" SelectionChanged="comboBoxVideoDevice_SelectionChanged">
+                 
+                   
+                </ComboBox>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Audio Options" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="171" Width="301">
+            <Grid>
+
+                <ComboBox x:Name="comboBoxOutputDevice" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="240" SelectionChanged="comboBoxOutputDevice_SelectionChanged"/>
+                <StackPanel x:Name="panelOutputDeviceSettings" HorizontalAlignment="Left" Height="76" Margin="10,68,0,0" VerticalAlignment="Top" Width="269"/>
+                <Label Content="Requested Latency:" HorizontalAlignment="Left" Margin="12,10,0,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboBoxLatency" HorizontalAlignment="Left" Margin="129,13,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="comboBoxLatency_SelectionChanged"/>
+                <Label Content="ms" HorizontalAlignment="Left" Margin="254,10,0,0" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
+
+    </Grid>
+</Window>

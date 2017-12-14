@@ -1,0 +1,27 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ShowComposer.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="AudioPlaybackOneOutput" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="WaveformDatabase" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">waveform.db3</Value>
+    </Setting>
+    <Setting Name="SqlitePackage" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">System.Data.SQLite, Version=1.0.103.0</Value>
+    </Setting>
+    <Setting Name="VLCVersion" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">2.2.6</Value>
+    </Setting>
+    <Setting Name="VLCSystemPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">progra~1\videolan\vlc\vlc.exe</Value>
+    </Setting>
+    <Setting Name="WMPSystemPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">progra~1\Windows Media Player\wmplayer.exe</Value>
+    </Setting>
+    <Setting Name="LoggingEnabled" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

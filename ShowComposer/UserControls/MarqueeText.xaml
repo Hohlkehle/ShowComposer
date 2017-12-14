@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="ShowComposer.UserControls.MarqueeText"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ShowComposer.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="20" d:DesignWidth="120" Padding="0" Margin="0">
+    <Canvas ClipToBounds="True" Name="canMain" Margin="0">
+        <TextBlock  Name="tbmarquee" Margin="0" Padding="0" Text="Helen-St.-John-Love-Theme-From-Flashdance-Flashdance-From-Motion-Picture-1983_(get-tune.net)" FontWeight="Bold"></TextBlock>
+    </Canvas>
+</UserControl>

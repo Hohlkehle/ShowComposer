@@ -1,0 +1,467 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7F6BF016-09C1-4A01-ABD4-CFD6ABD476EF}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ShowComposer</RootNamespace>
+    <AssemblyName>ShowComposer</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.2.13.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DocxToFlowDocumentConverter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>libs\DocxToFlowDocumentConverter.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>libs\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NAudio.1.7.3\lib\net35\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Flac">
+      <HintPath>..\packages\NAudio.Flac.1.0.5702.29018\lib\net45\NAudio.Flac.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.WindowsMediaFormat">
+      <HintPath>libs\NAudio.WindowsMediaFormat.dll</HintPath>
+    </Reference>
+    <Reference Include="ReachFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>libs\System.Data.SQLite.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="taglib-sharp">
+      <HintPath>libs\taglib-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Vlc.DotNet.Core">
+      <HintPath>libs\vlc\Vlc.DotNet.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Vlc.DotNet.Core.Interops">
+      <HintPath>libs\vlc\Vlc.DotNet.Core.Interops.dll</HintPath>
+    </Reference>
+    <Reference Include="Vlc.DotNet.Forms">
+      <HintPath>libs\vlc\Vlc.DotNet.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="Vlc.DotNet.Wpf">
+      <HintPath>libs\vlc\Vlc.DotNet.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="Xceed.Wpf.Toolkit">
+      <HintPath>libs\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Core\CommandHelper.cs" />
+    <Compile Include="Core\GlobalKeyboardController.cs" />
+    <Compile Include="Core\GlobalKeyboardHook.cs" />
+    <Compile Include="Core\VideoPlaybackOptions.cs" />
+    <Compile Include="Data\AudioPlayerInfo.cs" />
+    <Compile Include="Data\CanvasItemInfo.cs" />
+    <Compile Include="Data\ComposerLayout.cs" />
+    <Compile Include="Data\GridExtentions.cs" />
+    <Compile Include="Data\LayoutFileReader.cs" />
+    <Compile Include="Data\PowerPointInfo.cs" />
+    <Compile Include="Data\Preferences.cs" />
+    <Compile Include="Data\ScreenHandler.cs" />
+    <Compile Include="Data\SQLiteHelper.cs" />
+    <Compile Include="Data\VideoPlayerInfo.cs" />
+    <Compile Include="DraggableUI\DeskLayoutEventArgs.cs" />
+    <Compile Include="DraggableUI\GuideLine.xaml.cs">
+      <DependentUpon>GuideLine.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DraggableUI\LayoutEditorSelectionEventArgs.cs" />
+    <Compile Include="DraggableUI\IDraggableUIElement.cs" />
+    <Compile Include="DraggableUI\SimpleCircleAdorner.cs" />
+    <Compile Include="DraggableUI\UIElementEventType.cs" />
+    <Compile Include="ExecutionHelper.cs" />
+    <Compile Include="Core\globalKeyboardHook2.cs" />
+    <Compile Include="IniFile.cs" />
+    <Compile Include="LayoutProperties.cs" />
+    <Compile Include="NAudioDemo\AudioPlaybackDemo\AsioOutPlugin.cs" />
+    <Compile Include="NAudioDemo\AudioPlaybackDemo\AudioPlaybackPanel.xaml.cs">
+      <DependentUpon>AudioPlaybackPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NAudioDemo\AudioPlaybackDemo\DirectSoundOutPlugin.cs" />
+    <Compile Include="NAudioDemo\AudioPlaybackDemo\DirectSoundOutSettingsPanel.xaml.cs">
+      <DependentUpon>DirectSoundOutSettingsPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NAudioDemo\AudioPlaybackDemo\IOutputDevicePlugin.cs" />
+    <Compile Include="NAudioDemo\AudioPlaybackDemo\NullOutPut.cs" />
+    <Compile Include="NAudioDemo\AudioPlaybackDemo\WasapiOutPlugin.cs" />
+    <Compile Include="NAudioDemo\AudioPlaybackDemo\WasapiOutSettingsPanel.xaml.cs">
+      <DependentUpon>WasapiOutSettingsPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NAudioDemo\AudioPlaybackDemo\WaveformSeekbar.xaml.cs">
+      <DependentUpon>WaveformSeekbar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NAudioDemo\AudioPlaybackDemo\WaveOutPlugin.cs" />
+    <Compile Include="NAudioDemo\AudioPlaybackDemo\WaveOutSettingsPanel.xaml.cs">
+      <DependentUpon>WaveOutSettingsPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NAudioDemo\Gui\VolumeMeter.xaml.cs">
+      <DependentUpon>VolumeMeter.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NAudioDemo\Gui\WaveformPainter.xaml.cs">
+      <DependentUpon>WaveformPainter.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NAudioDemo\StreamExtension.cs" />
+    <Compile Include="SamplesConverter.cs" />
+    <Compile Include="Core\UserActivityHook.cs" />
+    <Compile Include="UserControls\AudioPlaybackControl.xaml.cs">
+      <DependentUpon>AudioPlaybackControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\AudioPlaybackControlBig.xaml.cs">
+      <DependentUpon>AudioPlaybackControlBig.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\AudioPlaybackControlNotify.cs" />
+    <Compile Include="UserControls\DeskLayout.xaml.cs">
+      <DependentUpon>DeskLayout.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\DeskLayoutGrid.xaml.cs">
+      <DependentUpon>DeskLayoutGrid.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\MarqueeText.xaml.cs">
+      <DependentUpon>MarqueeText.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\MasterVolumeControl.xaml.cs">
+      <DependentUpon>MasterVolumeControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\PowerPointControl.xaml.cs">
+      <DependentUpon>PowerPointControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ScreenplayRack.xaml.cs">
+      <DependentUpon>ScreenplayRack.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\VideoPlaybackControl.xaml.cs">
+      <DependentUpon>VideoPlaybackControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WaitCursor.cs" />
+    <Compile Include="Windows\AudioPlaybackPropertiesWindow.xaml.cs">
+      <DependentUpon>AudioPlaybackPropertiesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\AudipPlaybakPropertiesWindow.xaml.cs">
+      <DependentUpon>AudipPlaybakPropertiesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\LoggingWindow.xaml.cs">
+      <DependentUpon>LoggingWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\OptionsWindow.xaml.cs">
+      <DependentUpon>OptionsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SampleDeskWindow.xaml.cs">
+      <DependentUpon>SampleDeskWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\VideoPlaybackWindow.xaml.cs">
+      <DependentUpon>VideoPlaybackWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\VLCVideoPlaybackWindow.xaml.cs">
+      <DependentUpon>VLCVideoPlaybackWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\VolumeControlWindow.xaml.cs">
+      <DependentUpon>VolumeControlWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="DraggableUI\GuideLine.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="NAudioDemo\AudioPlaybackDemo\AudioPlaybackPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NAudioDemo\AudioPlaybackDemo\DirectSoundOutSettingsPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NAudioDemo\AudioPlaybackDemo\WasapiOutSettingsPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NAudioDemo\AudioPlaybackDemo\WaveformSeekbar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NAudioDemo\AudioPlaybackDemo\WaveOutSettingsPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NAudioDemo\Gui\VolumeMeter.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NAudioDemo\Gui\WaveformPainter.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\AudioPlaybackControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\AudioPlaybackControlBig.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\DeskLayout.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\DeskLayoutGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\MarqueeText.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\MasterVolumeControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\PowerPointControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ScreenplayRack.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\VideoPlaybackControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\AudioPlaybackPropertiesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\AudipPlaybakPropertiesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\LoggingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\OptionsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SampleDeskWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\VideoPlaybackWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\VLCVideoPlaybackWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\VolumeControlWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="error.docx" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+    <None Include="scenario.docx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LayoutFile\LayoutFileSystem.csproj">
+      <Project>{43e46063-2d76-45ac-a042-d39ed9aed216}</Project>
+      <Name>LayoutFileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VolumeControlWpf\VolumeControlWpf.csproj">
+      <Project>{02bc8643-1117-4a7c-86a7-ca1565606a64}</Project>
+      <Name>VolumeControlWpf</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\6941572_460s_v1.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\spacer128x128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\adds-add-file-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\spacer128x128-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\button-play.png" />
+    <Resource Include="Images\button-stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\button-pause-icon.png" />
+    <Resource Include="Images\button-play-icon.png" />
+    <Resource Include="Images\button-stop-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\debug-open-in-browser-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\mathematic-multiply2-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Microsoft_Word_2013_logo.svg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PowerPoint-2-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\photo-video-remove-image-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\1474558108_save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\1474558995_close_window.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\1474559200_cancel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\1474559200_cancel_white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Capture.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\system-unpin2-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\file-types-powerpoint-icon.png" />
+    <Resource Include="Images\file-types-word-icon.png" />
+    <Resource Include="Images\very-basic-video-file-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\house-and-appliances-channel-mosaic-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\very-basic-refresh-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\license.png" />
+    <Resource Include="Images\settings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\very-basic-volume-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
