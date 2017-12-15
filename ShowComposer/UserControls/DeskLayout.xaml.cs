@@ -41,6 +41,7 @@ namespace ShowComposer.UserControls
         private GuideLine[] m_GuideLines;
         private UIElement m_SelectedElement = null;
         private WindowsPoint m_StartPoint;
+        private int m_DragDelta = 10;
 
         //private Layout m_Layout;
         //private string m_FileName = @"scenario 1.scomp";
@@ -56,7 +57,8 @@ namespace ShowComposer.UserControls
         }
         public bool IsCtrlDown
         {
-            get { return m_IsCtrlDown; }
+            //TODO
+            get { return Properties.Settings.Default.UseDraggingModifierKey ? m_IsCtrlDown : true; }
             set
             {
                 m_IsCtrlDown = value;
@@ -116,7 +118,12 @@ namespace ShowComposer.UserControls
         /// <param name="e"></param>
         void DragFinishedMouseHandler(object sender, MouseButtonEventArgs e)
         {
-            OnUIElementEvent(this, new DeskLayoutEventArgs(m_SelectedElement) { UIElementEventType = UIElementEventType.StopDragging });
+            var thr = m_StartPoint - Mouse.GetPosition(myCanvas);
+            if (Math.Sqrt(thr.X * thr.X + thr.Y * thr.Y) < m_DragDelta)
+            {
+                e.Handled = false;
+            } else
+                OnUIElementEvent(this, new DeskLayoutEventArgs(m_SelectedElement) { UIElementEventType = UIElementEventType.StopDragging });
             StopDragging();
             //e.Handled = true;
         }
@@ -142,11 +149,14 @@ namespace ShowComposer.UserControls
         {
             if (m_IsDown)
             {
+                var thr = m_StartPoint - Mouse.GetPosition(myCanvas);
+                if(Math.Sqrt(thr.X * thr.X + thr.Y * thr.Y) > m_DragDelta)
+
                 if ((m_IsDragging == false) &&
                     ((Math.Abs(e.GetPosition(myCanvas).X - m_StartPoint.X) > SystemParameters.MinimumHorizontalDragDistance) ||
                     (Math.Abs(e.GetPosition(myCanvas).Y - m_StartPoint.Y) > SystemParameters.MinimumVerticalDragDistance)))
                     m_IsDragging = true;
-
+                e.Handled = true;
                 if (m_IsDragging && m_SelectedElement != null)
                 {
                     var position = Mouse.GetPosition(myCanvas);
@@ -229,7 +239,7 @@ namespace ShowComposer.UserControls
 
             // If any element except canvas is clicked, 
             // assign the selected element and add the adorner
-            if (e.Source is IDraggableUIElement && ((IDraggableUIElement)e.Source).ClutchElement() && m_IsCtrlDown)
+            if (e.Source is IDraggableUIElement && ((IDraggableUIElement)e.Source).ClutchElement() && IsCtrlDown)
             {
                 m_IsDown = true;
                 m_StartPoint = e.GetPosition(myCanvas);
@@ -243,7 +253,7 @@ namespace ShowComposer.UserControls
                 //m_ALayer.Add(new ResizingAdorner(m_SelectedElement));
 
                 m_IsSelected = true;
-                e.Handled = true;
+                //e.Handled = true;
 
                 m_GuideLines = myCanvas.Children.OfType<GuideLine>().ToArray();
                 //PushCommandToHistory(new MoveCommand(m_SelectedElement));
@@ -325,7 +335,8 @@ namespace ShowComposer.UserControls
             //myScrollViewer.IsHitTestVisible = false;
             if (!e.Handled)
             {
-                HandleDragDrop(e);
+                //TODO
+                //HandleDragDrop(e);
 
                 e.Handled = true;
             }
@@ -519,7 +530,11 @@ namespace ShowComposer.UserControls
             if (!MainWindow.IsProjectLoaded)
                 return;
 
+            Mouse.Capture(myCanvas);
+
             var position = Mouse.GetPosition(myCanvas);
+             
+            Mouse.Capture(null);
 
             if(position.X < 0 || position.Y < 0)
             {

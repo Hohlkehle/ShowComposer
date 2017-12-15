@@ -201,7 +201,7 @@ namespace ShowComposer
 
 
             m_VolumeControlWindow?.Close();
-
+            LoggingWindow.Quit();
             SaveSettings();
         }
 

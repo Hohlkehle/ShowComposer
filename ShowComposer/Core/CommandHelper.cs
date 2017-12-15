@@ -24,9 +24,15 @@ namespace ShowComposer.Core
 
             } else
             {
+                if (!LoggingWindowInstance.IsLoaded)
+                    LoggingWindowInstance = new LoggingWindow();
+
                 LoggingWindowInstance.Log(message);
+                
                 LoggingWindowInstance.Show();
             }
         }
+
+        
     }
 }

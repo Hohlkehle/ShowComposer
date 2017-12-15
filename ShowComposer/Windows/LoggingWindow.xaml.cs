@@ -45,5 +45,13 @@ namespace ShowComposer.Windows
                 RichTextBox1.AppendText("\n");
             });
         }
+
+        public static void Quit()
+        {
+            if(instance != null)
+            {
+                instance.Close();
+            }
+        }
     }
 }

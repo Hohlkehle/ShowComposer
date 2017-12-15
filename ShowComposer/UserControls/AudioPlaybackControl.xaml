@@ -546,7 +546,7 @@
         </Grid.ContextMenu>
    
         <Border x:Name="BorderContour" Background="#CC1a8cff" BorderThickness="2" Visibility="Visible" Margin="2,26,-414,-27"/>
-        <Border x:Name="BorderBackground" BorderThickness="1,1,1,1" Margin="8,30,-416,-24" Background="#C8141418" />
+        <Border x:Name="BorderBackground" BorderThickness="1,1,1,1" Margin="8,30,-416,-24" Background="#C8141418" Cursor="SizeAll" />
 
         <Gui:VolumeMeter x:Name="volumeMeter1" HorizontalAlignment="Left" Height="51" Margin="10,10,-19,-34" VerticalAlignment="Top" Width="39"/>
 
@@ -579,14 +579,14 @@
         <ProgressBar x:Name="ProgressBarPosition" Margin="131,38,-249,-15" Visibility="Visible" IsHitTestVisible="False" Value="0" Style="{StaticResource ProgressBarStyle}" />
         <ProgressBar x:Name="ProgressBarVolume" Margin="318,37,-391,-16" Visibility="Visible" IsHitTestVisible="False" Value="0.5" Style="{StaticResource ProgressBarStyle}" Maximum="1" LargeChange="0.2"/>
 
-        <TextBlock x:Name="TextBlockPlayedTime" HorizontalAlignment="Left" Margin="93,35,-96,-20" TextWrapping="Wrap" Text="00:00" VerticalAlignment="Top" Height="12" Width="33" FontFamily="Arial Rounded MT Bold" FontWeight="Bold" TextAlignment="Right" FontSize="11" Foreground="#FF8390CD"/>
-        <TextBlock x:Name="TextBlockTotalTime" HorizontalAlignment="Left" Margin="281,34,-284,-19" TextWrapping="Wrap" Text="03:00" VerticalAlignment="Top" Height="12" Width="33" FontFamily="Arial Rounded MT Bold" FontWeight="Bold" TextAlignment="Right" FontSize="11" Foreground="#FF8390CD"/>
+        <TextBlock x:Name="TextBlockPlayedTime" HorizontalAlignment="Left" Margin="93,35,-96,-20" TextWrapping="Wrap" Text="00:00" VerticalAlignment="Top" Height="12" Width="33" FontFamily="Arial Rounded MT Bold" FontWeight="Bold" TextAlignment="Right" FontSize="11" Foreground="#FF8390CD" Cursor="SizeAll"/>
+        <TextBlock x:Name="TextBlockTotalTime" HorizontalAlignment="Left" Margin="281,34,-284,-19" TextWrapping="Wrap" Text="03:00" VerticalAlignment="Top" Height="12" Width="33" FontFamily="Arial Rounded MT Bold" FontWeight="Bold" TextAlignment="Right" FontSize="11" Foreground="#FF8390CD" Cursor="SizeAll"/>
         <!--<UserControls:MarqueeText x:Name="TextBlockTrackTitle2" Padding="0" Visibility="Hidden" HorizontalAlignment="Left" Height="24" Margin="87,8,-367,-5"  Text="16. Marina ок The Diamonds - Primadonna" VerticalAlignment="Top" Width="310"  FontWeight="Bold" FontSize="12.5" MarqueeType="LeftToRight" MarqueeTimeInSeconds="12"  Foreground="{DynamicResource {x:Static SystemColors.InfoBrushKey}}">
             <UserControls:MarqueeText.Background>
                 <SolidColorBrush Color="Black" Opacity="0.3"/>
             </UserControls:MarqueeText.Background>
         </UserControls:MarqueeText>-->
-        <TextBlock x:Name="TextBlockTrackTitle" Visibility="Visible" HorizontalAlignment="Left" Margin="87,15,-395,-2" Text="16. Marina ок The Diamonds - Primadonna" VerticalAlignment="Top" Height="14" Width="338" FontWeight="Bold" FontSize="12.5" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Padding="0" >
+        <TextBlock x:Name="TextBlockTrackTitle" Visibility="Visible" HorizontalAlignment="Left" Margin="87,15,-395,-2" Text="16. Marina ок The Diamonds - Primadonna" VerticalAlignment="Top" Height="14" Width="338" FontWeight="Bold" FontSize="12.5" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Padding="0" Cursor="SizeAll" >
             <TextBlock.Background>
                 <SolidColorBrush Color="White" Opacity="0.85"/>
             </TextBlock.Background>
