@@ -363,6 +363,11 @@
     </None>
     <AppDesigner Include="Properties\" />
     <None Include="scenario.docx" />
+    <None Include="ThirdParty\libvlc.zip" />
+    <None Include="ThirdParty\settings.ini" />
+    <None Include="ThirdParty\sqlite.zip" />
+    <None Include="ThirdParty\vlc-2.2.6.zip" />
+    <None Include="ThirdParty\winamp.zip" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -456,7 +461,19 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="ThirdParty\7za.exe" />
+    <Content Include="ThirdParty\scfmm.exe" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>IF NOT EXIST $(OutDir)\sqlite $(ProjectDir)\ThirdParty\7za.exe x -o"$(TargetDir)" "$(ProjectDir)\ThirdParty\sqlite.zip"
+IF NOT EXIST $(OutDir)\libvlc $(ProjectDir)\ThirdParty\7za.exe x -o"$(TargetDir)" "$(ProjectDir)\ThirdParty\libvlc.zip"
+IF NOT EXIST $(OutDir)\vlc-2.2.6 $(ProjectDir)\ThirdParty\7za.exe x -o"$(TargetDir)" "$(ProjectDir)\ThirdParty\vlc-2.2.6.zip"
+IF NOT EXIST $(OutDir)\winamp $(ProjectDir)\ThirdParty\7za.exe x -o"$(TargetDir)" "$(ProjectDir)\ThirdParty\winamp.zip"
+xcopy $(ProjectDir)\ThirdParty\scfmm.exe $(OutDir) /u /y
+xcopy $(ProjectDir)\ThirdParty\settings.ini $(OutDir) /u /y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
