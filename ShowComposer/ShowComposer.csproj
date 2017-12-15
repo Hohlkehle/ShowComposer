@@ -137,9 +137,9 @@
     <Compile Include="DraggableUI\IDraggableUIElement.cs" />
     <Compile Include="DraggableUI\SimpleCircleAdorner.cs" />
     <Compile Include="DraggableUI\UIElementEventType.cs" />
-    <Compile Include="ExecutionHelper.cs" />
+    <Compile Include="Core\ExecutionHelper.cs" />
     <Compile Include="Core\globalKeyboardHook2.cs" />
-    <Compile Include="IniFile.cs" />
+    <Compile Include="Utilities\IniFile.cs" />
     <Compile Include="LayoutProperties.cs" />
     <Compile Include="NAudioDemo\AudioPlaybackDemo\AsioOutPlugin.cs" />
     <Compile Include="NAudioDemo\AudioPlaybackDemo\AudioPlaybackPanel.xaml.cs">
@@ -169,7 +169,7 @@
       <DependentUpon>WaveformPainter.xaml</DependentUpon>
     </Compile>
     <Compile Include="NAudioDemo\StreamExtension.cs" />
-    <Compile Include="SamplesConverter.cs" />
+    <Compile Include="Utilities\SamplesConverter.cs" />
     <Compile Include="Core\UserActivityHook.cs" />
     <Compile Include="UserControls\AudioPlaybackControl.xaml.cs">
       <DependentUpon>AudioPlaybackControl.xaml</DependentUpon>

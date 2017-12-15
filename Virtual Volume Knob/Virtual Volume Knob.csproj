@@ -113,12 +113,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ColorSlider\ColorSlider.csproj">
-      <Project>{16e224dc-7ff0-4908-8318-d6a3ac2e797a}</Project>
-      <Name>ColorSlider</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\BTN_Thumb.bmp" />
   </ItemGroup>
   <ItemGroup>

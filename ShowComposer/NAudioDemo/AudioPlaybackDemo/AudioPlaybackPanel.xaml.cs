@@ -1,19 +1,8 @@
-﻿using NAudio.Wave;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.ComponentModel.Composition;
+using System.Linq;
+using System.Windows.Controls;
 
 namespace ShowComposer.NAudioDemo.AudioPlaybackDemo
 {
@@ -22,10 +11,10 @@ namespace ShowComposer.NAudioDemo.AudioPlaybackDemo
     /// </summary>
     public partial class AudioPlaybackPanel : UserControl
     {
-        private IWavePlayer waveOut;
-        private string fileName = null;
-        private AudioFileReader audioFileReader;
-        private Action<float> setVolumeDelegate;
+        //private IWavePlayer waveOut;
+        //private string fileName = null;
+        //private AudioFileReader audioFileReader;
+        //private Action<float> setVolumeDelegate;
 
         private IOutputDevicePlugin SelectedOutputDevicePlugin
         {

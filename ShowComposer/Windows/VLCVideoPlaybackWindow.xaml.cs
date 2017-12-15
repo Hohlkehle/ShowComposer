@@ -29,17 +29,22 @@ namespace ShowComposer.Windows
     /// </summary>
     public partial class VLCVideoPlaybackWindow : Window
     {
-        private string m_VideoFile;
-        private double m_VolumeSens = 6;
-        private bool IsCtrlDown;
-        private bool m_IsFullScreen;
-        bool sliderSeekdragStarted;
-        DateTime sliderSeekMouseDownStart;
-        private UserActivityHook actHook;
-        int m_Volume = 50;
-        long lastclick;
-        int doubleClickSensetivity = 2200000;
         public event EventHandler OnVolumeValueChanged;
+        //private bool IsCtrlDown;
+        private string m_VideoFile;
+        private bool m_IsFullScreen;
+
+        private bool m_SliderSeekdragStarted;
+        private DateTime m_SliderSeekMouseDownStart;
+
+        private double m_VolumeSens = 6;
+        private int m_Volume = 50;
+
+        private long m_LastClickTime;
+        private int m_DoubleClickSensetivity = 2200000;
+
+        private UserActivityHook m_ActHook;
+
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         private static extern IntPtr GetForegroundWindow();
 
@@ -51,7 +56,6 @@ namespace ShowComposer.Windows
             set
             {
                 m_Volume = (int)value;
-               
             }
             get
             {
@@ -67,23 +71,23 @@ namespace ShowComposer.Windows
             {
                 m_VideoFile = value;
                 //mePlayer.Source = new Uri(m_VideoFile);
-                this.Title = string.Format("{0}", System.IO.Path.GetFileName(m_VideoFile));
+                Title = string.Format("{0}", System.IO.Path.GetFileName(m_VideoFile));
                 lblFilename.Content = this.Title;
             }
         }
 
         public bool IsFullScreen
         {
-            get { return m_IsFullScreen = this.WindowState == System.Windows.WindowState.Maximized; }
+            get { return m_IsFullScreen = this.WindowState == WindowState.Maximized; }
             set
             {
                 if (value)
                 {
-                    this.WindowState = System.Windows.WindowState.Maximized;
+                    this.WindowState = WindowState.Maximized;
                 }
                 else
                 {
-                    this.WindowState = System.Windows.WindowState.Normal;
+                    this.WindowState = WindowState.Normal;
                 }
                 m_IsFullScreen = value;
             }
@@ -128,16 +132,14 @@ namespace ShowComposer.Windows
                 });
             };
 
-
-            actHook = new UserActivityHook(); // crate an instance with global hooks
-                                              // hang on events
-            //actHook.OnMouseActivity += new System.Windows.Forms.MouseEventHandler(MouseMoved);
-            actHook.OnMouseActivity += ActHook_OnMouseActivity;
-            actHook.Start();
+            // crate an instance with global hooks hang on events
+            m_ActHook = new UserActivityHook();
+            m_ActHook.OnMouseActivity += ActHook_OnMouseActivity;
+            m_ActHook.Start();
             
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += timer_Tick;
+            timer.Tick += Timer_Tick;
             timer.Start();
         }
 
@@ -181,7 +183,7 @@ namespace ShowComposer.Windows
             }
 
             // DoubleClick
-            if (e.Button == System.Windows.Forms.MouseButtons.Left && DateTime.Now.Ticks - lastclick < doubleClickSensetivity)
+            if (e.Button == System.Windows.Forms.MouseButtons.Left && DateTime.Now.Ticks - m_LastClickTime < m_DoubleClickSensetivity)
             {
 
                 if (WindowState != WindowState.Maximized)
@@ -190,7 +192,7 @@ namespace ShowComposer.Windows
                     WindowState = WindowState.Normal;
             }
 
-            lastclick = DateTime.Now.Ticks;
+            m_LastClickTime = DateTime.Now.Ticks;
         }
 
         private bool IsPointInBounds(Point cursorPosition, FrameworkElement control)
@@ -225,15 +227,6 @@ namespace ShowComposer.Windows
                 e.VlcLibDirectory = new DirectoryInfo(System.IO.Path.Combine(currentDirectory, @"libvlc\x64\"));
         }
 
-        private MediaState GetMediaState(MediaElement myMedia)
-        {
-            FieldInfo hlp = typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance);
-            object helperObject = hlp.GetValue(myMedia);
-            FieldInfo stateField = helperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
-            MediaState state = (MediaState)stateField.GetValue(helperObject);
-            return state;
-        }
-
         private void LoadVideoFileFromDrop(string file)
         {
             VideoFile = file;
@@ -246,7 +239,7 @@ namespace ShowComposer.Windows
             }
         }
 
-        void timer_Tick(object sender, EventArgs e)
+        void Timer_Tick(object sender, EventArgs e)
         {
             if (MyControl.MediaPlayer != null && VideoFile != null)
             {
@@ -265,9 +258,7 @@ namespace ShowComposer.Windows
 
         public void Play()
         {
-            //mePlayer.Play();
             //MyControl.MediaPlayer.Play(new FileInfo(@"H:\Movie\Мультфильмы\Gravity Falls_(2012)-WEB-DLRip_1s_nnm\Gravity.Falls.S01E06.rus.eng.avi"));
-            
             MyControl.MediaPlayer.Play(new FileInfo(VideoFile));
         }
 
@@ -280,11 +271,11 @@ namespace ShowComposer.Windows
         {
             var screen = ScreenHandler.GetScreen(monitor);
             var currentScreen = ScreenHandler.GetCurrentScreen(this);
-            this.WindowState = WindowState.Normal;
-            this.Left = screen.WorkingArea.Left;
-            this.Top = screen.WorkingArea.Top;
-            this.Width = screen.WorkingArea.Width;
-            this.Height = screen.WorkingArea.Height;
+            WindowState = WindowState.Normal;
+            Left = screen.WorkingArea.Left;
+            Top = screen.WorkingArea.Top;
+            Width = screen.WorkingArea.Width;
+            Height = screen.WorkingArea.Height;
         }
 
         /// <summary>
@@ -339,10 +330,9 @@ namespace ShowComposer.Windows
         {
             if (e.ChangedButton == MouseButton.Right)
             {
-                this.CaptureMouse();
-                this.m_IsDragInProgress = true;
-                // 
-                this.m_FormMousePosition = e.GetPosition((UIElement)this);
+                CaptureMouse();
+                m_IsDragInProgress = true;
+                m_FormMousePosition = e.GetPosition((UIElement)this);
             }
             base.OnMouseDown(e);
         }
@@ -350,7 +340,6 @@ namespace ShowComposer.Windows
         protected override void OnMouseMove(MouseEventArgs e)
         {
             //lblStatus.Content = string.Format("MouseRelative: {0}, MousePos: {1}", e.GetPosition(this), e.GetPosition(null));
-
             var asize = this.ActualHeight / 100.0 * 10.0;
             var mPos = e.GetPosition(this);
             if (mPos.Y > this.ActualHeight - asize)
@@ -361,7 +350,6 @@ namespace ShowComposer.Windows
             {
                 GridControl.Opacity = 0;
             }
-
 
             if (this.m_IsDragInProgress)
             {
@@ -393,7 +381,7 @@ namespace ShowComposer.Windows
             {
                 Panel.SetZIndex(GridControl, 999999999);
                 //Panel.SetZIndex(MyControl, -1);
-                IsCtrlDown = false;
+                //IsCtrlDown = false;
             }
 
             if (e.Key == Key.Space)
@@ -445,7 +433,7 @@ namespace ShowComposer.Windows
         {
             if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
             {
-                IsCtrlDown = true;
+                //IsCtrlDown = true;
             }
 
             if (e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.Enter)
@@ -471,7 +459,6 @@ namespace ShowComposer.Windows
                 ProgressBarVolume.Value = Volume;
             }
 
-
             if (e.Key == Key.Escape)
             {
                 Stop();
@@ -488,7 +475,7 @@ namespace ShowComposer.Windows
             }
         }
 
-        private void myGrid_DragEnter(object sender, DragEventArgs e)
+        private void Grid_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 e.Effects = DragDropEffects.Copy; // Okay
@@ -496,10 +483,10 @@ namespace ShowComposer.Windows
                 e.Effects = DragDropEffects.None; // Unknown data, ignore it
         }
 
-        private void myGrid_DragLeave(object sender, DragEventArgs e)
+        private void Grid_DragLeave(object sender, DragEventArgs e)
         { }
 
-        private void myGrid_Drop(object sender, DragEventArgs e)
+        private void Grid_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -514,7 +501,6 @@ namespace ShowComposer.Windows
                     if (DeskLayout.IsVideoFile(fileList[0]))
                     {
                         LoadVideoFileFromDrop(fileList[0]);
-
                         e.Handled = true;
                     }
                     else
@@ -547,85 +533,54 @@ namespace ShowComposer.Windows
             Volume = MyControl.MediaPlayer.Audio.Volume = volume;
         }
 
-        private void sliderPosition_ThumbDragCompleted(object sender, DragCompletedEventArgs e)
+        private void SliderPosition_ThumbDragCompleted(object sender, DragCompletedEventArgs e)
         {
             if (MyControl.MediaPlayer != null)
             {
                 MyControl.MediaPlayer.Time = (long)( MyControl.MediaPlayer.Time * sliderPosition.Value / 100.0);
-                //mePlayer.Pause();
-                //mePlayer.Position = TimeSpan.FromSeconds(mePlayer.NaturalDuration.TimeSpan.TotalSeconds * sliderPosition.Value / 100.0);
-                //mePlayer.Play();
             }
 
-            sliderSeekdragStarted = false;
+            m_SliderSeekdragStarted = false;
         }
 
-        private void sliderPosition_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        private void SliderPosition_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             if (MyControl.MediaPlayer == null) return;
 
-            if (DateTime.Now - sliderSeekMouseDownStart > TimeSpan.FromMilliseconds(300))
-                sliderPosition_ThumbDragCompleted(null, null);
+            if (DateTime.Now - m_SliderSeekMouseDownStart > TimeSpan.FromMilliseconds(300))
+                SliderPosition_ThumbDragCompleted(null, null);
             else
             {
-
                 var pos = e.GetPosition(sliderPosition);
 
                 //sliderPosition.Value = SmoothStep(pos.X, 0, sliderPosition.ActualWidth, sliderPosition.Minimum, sliderPosition.Maximum);
                 sliderPosition.Value = (long)(MyControl.MediaPlayer.Time * sliderPosition.Value / 100.0);
-                //mePlayer.Position = TimeSpan.FromSeconds(mePlayer.NaturalDuration.TimeSpan.TotalSeconds * sliderPosition.Value / 100.0);
 
-                sliderSeekdragStarted = false;
+                m_SliderSeekdragStarted = false;
             }
         }
 
-        private void sliderPosition_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void SliderPosition_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            sliderSeekMouseDownStart = DateTime.Now;
-            sliderSeekdragStarted = true;
+            m_SliderSeekMouseDownStart = DateTime.Now;
+            m_SliderSeekdragStarted = true;
         }
 
-        private void sliderPosition_ThumbDragStarted(object sender, DragStartedEventArgs e)
+        private void SliderPosition_ThumbDragStarted(object sender, DragStartedEventArgs e)
         {
-            sliderSeekdragStarted = true;
+            m_SliderSeekdragStarted = true;
         }
 
-        private void sliderPosition_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void SliderPosition_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            // Приостановка воспроизведения перед переходом в другую позицию
-            // исключит "заикания" при слишком быстрых движениях ползунка,
-            if (MyControl.MediaPlayer != null && sliderSeekdragStarted)
+            // Приостановка воспроизведения перед переходом в другую позицию исключит "заикания" при слишком быстрых движениях ползунка.
+            if (MyControl.MediaPlayer != null && m_SliderSeekdragStarted)
             {
-                //mePlayer.Pause();
                 MyControl.MediaPlayer.Time = (long)sliderPosition.Value;
-                //mePlayer.Play();
-
                 //ProgressBarProgress.Value = sliderPosition.Value;
             }
         }
-
-        private void mePlayer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                IsFullScreen = !IsFullScreen;
-            }
-        }
-
-        private void mePlayer_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            if (MyControl.MediaPlayer != null && e.LeftButton == MouseButtonState.Pressed)
-            {
-                if (CurrentState == MediaStates.Playing)
-                    MyControl.MediaPlayer.Pause();
-                else if (CurrentState == MediaStates.Paused || CurrentState == MediaStates.Stopped)
-                    MyControl.MediaPlayer.Play();
-
-                e.Handled = true;
-            }
-
-        }
-
+        
         private void VideoPlaybackFullScreen_Click(object sender, RoutedEventArgs e)
         {
             IsFullScreen = !IsFullScreen;
@@ -649,8 +604,8 @@ namespace ShowComposer.Windows
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (actHook != null)
-                actHook.Stop();
+            if (m_ActHook != null)
+                m_ActHook.Stop();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)

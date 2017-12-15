@@ -1,20 +1,11 @@
 ﻿using ShowComposer.Data;
 using ShowComposer.UserControls;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace ShowComposer.Windows
@@ -79,12 +70,12 @@ namespace ShowComposer.Windows
             InitializeComponent();
 
             instance = this;
-            mePlayer.MediaOpened += mePlayer_MediaOpened;
-            mePlayer.MediaEnded += mePlayer_MediaEnded;
+            mePlayer.MediaOpened += Player_MediaOpened;
+            mePlayer.MediaEnded += Player_MediaEnded;
 
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += timer_Tick;
+            timer.Tick += Timer_Tick;
             timer.Start();
 
         }
@@ -202,6 +193,9 @@ namespace ShowComposer.Windows
 
                     ProgressBarProgress.Value = mePlayer.Position.TotalSeconds;
                 }
+            } else if (IsCtrlDown)
+            {
+
             }
         }
 
@@ -219,7 +213,7 @@ namespace ShowComposer.Windows
             }
         }
 
-        void mePlayer_MediaOpened(object sender, RoutedEventArgs e)
+        void Player_MediaOpened(object sender, RoutedEventArgs e)
         {
             //SetAudioStreamIndex(0);
             sliderPosition.Value = 0;
@@ -228,13 +222,13 @@ namespace ShowComposer.Windows
             ProgressBarProgress.Maximum = sliderPosition.Maximum;
         }
 
-        void mePlayer_MediaEnded(object sender, RoutedEventArgs e)
+        void Player_MediaEnded(object sender, RoutedEventArgs e)
         {
             ProgressBarProgress.Value = sliderPosition.Value = 0;
             mePlayer.Stop();
         }
 
-        void timer_Tick(object sender, EventArgs e)
+        void Timer_Tick(object sender, EventArgs e)
         {
             if (mePlayer.Source != null)
             {
@@ -250,7 +244,7 @@ namespace ShowComposer.Windows
                 lblStatus.Content = "No file selected...";
         }
 
-        private void myGrid_DragEnter(object sender, DragEventArgs e)
+        private void Grid_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 e.Effects = DragDropEffects.Copy; // Okay
@@ -258,10 +252,10 @@ namespace ShowComposer.Windows
                 e.Effects = DragDropEffects.None; // Unknown data, ignore it
         }
 
-        private void myGrid_DragLeave(object sender, DragEventArgs e)
+        private void Grid_DragLeave(object sender, DragEventArgs e)
         { }
 
-        private void myGrid_Drop(object sender, DragEventArgs e)
+        private void Grid_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -338,7 +332,7 @@ namespace ShowComposer.Windows
             IsFullScreen = !IsFullScreen;
         }
 
-        private void mePlayer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Player_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
             {
@@ -362,7 +356,7 @@ namespace ShowComposer.Windows
                 OnVolumeValueChanged(this, EventArgs.Empty);
         }
 
-        private void sliderPosition_ThumbDragCompleted(object sender, DragCompletedEventArgs e)
+        private void SliderPosition_ThumbDragCompleted(object sender, DragCompletedEventArgs e)
         {
             if (mePlayer != null)
             {
@@ -374,12 +368,12 @@ namespace ShowComposer.Windows
             sliderSeekdragStarted = false;
         }
 
-        private void sliderPosition_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        private void SliderPosition_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             if (mePlayer == null) return;
 
             if (DateTime.Now - sliderSeekMouseDownStart > TimeSpan.FromMilliseconds(300))
-                sliderPosition_ThumbDragCompleted(null, null);
+                SliderPosition_ThumbDragCompleted(null, null);
             else
             {
 
@@ -393,18 +387,18 @@ namespace ShowComposer.Windows
             }
         }
 
-        private void sliderPosition_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void SliderPosition_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             sliderSeekMouseDownStart = DateTime.Now;
             sliderSeekdragStarted = true;
         }
 
-        private void sliderPosition_ThumbDragStarted(object sender, DragStartedEventArgs e)
+        private void SliderPosition_ThumbDragStarted(object sender, DragStartedEventArgs e)
         {
             sliderSeekdragStarted = true;
         }
 
-        private void sliderPosition_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void SliderPosition_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             // Приостановка воспроизведения перед переходом в другую позицию
             // исключит "заикания" при слишком быстрых движениях ползунка,
@@ -417,7 +411,6 @@ namespace ShowComposer.Windows
                 ProgressBarProgress.Value = sliderPosition.Value;
             }
         }
-
 
         /// <summary>
         /// Interpolates smoothly from c1 to c2 based on x compared to a1 and a2. 
@@ -457,7 +450,7 @@ namespace ShowComposer.Windows
             });
         }
 
-        private void mePlayer_MouseUp(object sender, MouseButtonEventArgs e)
+        private void Player_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (mePlayer != null && e.MouseDevice.LeftButton == MouseButtonState.Pressed)
             {

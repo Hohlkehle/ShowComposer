@@ -2,17 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ShowComposer.NAudioDemo.Gui
 {
@@ -35,8 +28,8 @@ namespace ShowComposer.NAudioDemo.Gui
             set { maxSamples = value; }
         }
         int insertPos;
-        private int bytesPerSample;
-        private int samplesPerPixel = 128;
+        //private int bytesPerSample;
+
 
         bool hasSamples { get { return false; } }
 
@@ -54,7 +47,7 @@ namespace ShowComposer.NAudioDemo.Gui
             maxSamples = RESOLUTION;//(int)this.ActualWidth;
 
             //bytesPerSample = (waveStream.WaveFormat.BitsPerSample / 8) * waveStream.WaveFormat.Channels;
-            bytesPerSample = (24 / 8) * 2;
+            //bytesPerSample = (24 / 8) * 2;
 
             //OnForeColorChanged(EventArgs.Empty);
             // OnResize(EventArgs.Empty);
@@ -356,8 +349,7 @@ namespace ShowComposer.NAudioDemo.Gui
             //maxSamples = (int)this.ActualWidth;
             base.OnRender(drawingContext);
             return;
-
-
+            /*
             var height = ActualHeight;
             var med = height / 2;
             StreamGeometry streamGeometry = new StreamGeometry();
@@ -403,9 +395,7 @@ namespace ShowComposer.NAudioDemo.Gui
 
 
 
-
-
-
+                        
 
                         //
                         //if (x + 1 < ActualWidth)
@@ -479,7 +469,7 @@ namespace ShowComposer.NAudioDemo.Gui
             //drawingContext.DrawGeometry(Brushes.LightGreen, new Pen(Brushes.White, 2), streamGeometry);
 
 
-
+            */
             /*return;
 
             float min = 0.0f, max = 0.0f; ;

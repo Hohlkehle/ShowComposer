@@ -652,11 +652,7 @@ namespace ShowComposer.UserControls
             return null;
         }
 
-        public static string[] audioExtensions = { ".WAV", ".MID", ".MIDI", ".WMA", ".MP3", ".OGG", ".RMA", ".FLAC" };
-        public static string[] videoExtensions = { ".AVI", ".MP4", ".DIVX", ".WMV", ".MKV" };
-        public static string[] imageExtensions = { ".PNG", ".JPG", ".JPEG", ".BMP", ".GIF" };
-        public static string[] presentExtensions = { ".ppt", ".pptx", ".pptm", ".potx", ".potm", ".pot", ".ppsx", ".ppsm", ".pps", ".ppam", ".ppa", ".odp" };
-
+        
         public static bool IsAcceptableFile(string filePath)
         {
             return System.IO.File.Exists(filePath) && (IsAudioFile(filePath) || IsVideoFile(filePath) || IsPresenterFile(filePath));
@@ -664,22 +660,22 @@ namespace ShowComposer.UserControls
 
         public static bool IsAudioFile(string path)
         {
-            return audioExtensions.Contains(System.IO.Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
+            return CommandHelper.IsAudioFile(path);
         }
 
         public static bool IsVideoFile(string path)
         {
-            return videoExtensions.Contains(System.IO.Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
+            return CommandHelper.IsVideoFile(path);
         }
 
         public static bool IsImageFile(string path)
         {
-            return imageExtensions.Contains(System.IO.Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
+            return CommandHelper.IsImageFile(path);
         }
 
         public static bool IsPresenterFile(string path)
         {
-            return presentExtensions.Contains(System.IO.Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
+            return CommandHelper.IsPresenterFile(path);
         }
         #endregion
 

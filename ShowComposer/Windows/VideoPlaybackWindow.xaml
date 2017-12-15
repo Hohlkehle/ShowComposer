@@ -128,7 +128,7 @@
 
     </Window.Resources>
 
-    <Grid Background="Black" AllowDrop="True" MouseLeftButtonDown="mePlayer_MouseLeftButtonDown" MouseWheel="Grid_MouseWheel" DragEnter="myGrid_DragEnter" DragLeave="myGrid_DragLeave" Drop="myGrid_Drop">
+    <Grid Background="Black" AllowDrop="True" MouseLeftButtonDown="Player_MouseLeftButtonDown" MouseWheel="Grid_MouseWheel" DragEnter="Grid_DragEnter" DragLeave="Grid_DragLeave" Drop="Grid_Drop">
         <Grid.ContextMenu>
             <ContextMenu>
                 <MenuItem Header="Full Screen" x:Name="VideoPlaybackFullScreen" Click="VideoPlaybackFullScreen_Click" />
@@ -136,7 +136,7 @@
                 <MenuItem Header="Exit" x:Name="VideoPlaybackExit" Click="VideoPlaybackExit_Click" />
             </ContextMenu>
         </Grid.ContextMenu>
-        <MediaElement x:Name="mePlayer" Source="Punk vs Metal.mp4" LoadedBehavior="Manual" MouseUp="mePlayer_MouseUp" />
+        <MediaElement x:Name="mePlayer" Source="Punk vs Metal.mp4" LoadedBehavior="Manual" MouseUp="Player_MouseUp" />
 
         <Grid x:Name="GridControl">
             
@@ -154,7 +154,7 @@
             <ProgressBar x:Name="ProgressBarVolume" Margin="0,0,10,10" Visibility="Visible" IsHitTestVisible="False" Value="0.5" Style="{StaticResource ProgressBarStyle}" Maximum="1" LargeChange="0.2" Height="8" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="114"/>
 
 
-            <Slider Minimum="0" Name="sliderPosition" ValueChanged="sliderPosition_ValueChanged" Thumb.DragCompleted="sliderPosition_ThumbDragCompleted"  Thumb.DragStarted="sliderPosition_ThumbDragStarted"  Margin="37,0,142,3" Height="22" VerticalAlignment="Bottom" PreviewMouseUp="sliderPosition_PreviewMouseUp" PreviewMouseDown="sliderPosition_PreviewMouseDown"/>
+            <Slider Minimum="0" Name="sliderPosition" ValueChanged="SliderPosition_ValueChanged" Thumb.DragCompleted="SliderPosition_ThumbDragCompleted"  Thumb.DragStarted="SliderPosition_ThumbDragStarted"  Margin="37,0,142,3" Height="22" VerticalAlignment="Bottom" PreviewMouseUp="SliderPosition_PreviewMouseUp" PreviewMouseDown="SliderPosition_PreviewMouseDown"/>
             <ProgressBar x:Name="ProgressBarProgress" Margin="37,0,147,10" Visibility="Visible" IsHitTestVisible="False" Value="1" Style="{StaticResource ProgressBarStyle}" Maximum="1" LargeChange="0.2" Height="8" VerticalAlignment="Bottom"/>
         </Grid>
 

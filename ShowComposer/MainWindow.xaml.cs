@@ -1,36 +1,27 @@
 ﻿//using Microsoft.Office.Interop.Word;
+using DocxReaderApplication;
+using LayoutFileSystem;
 using Microsoft.Win32;
+using ShowComposer.Data;
+//using Word = Microsoft.Office.Interop.Word;
+using ShowComposer.DraggableUI;
+using ShowComposer.NAudioDemo.AudioPlaybackDemo;
+using ShowComposer.UserControls;
+using ShowComposer.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Xps.Packaging;
-//using Word = Microsoft.Office.Interop.Word;
-using WindowsPoint = System.Windows.Point;
-using ShowComposer.DraggableUI;
-using LayoutFileSystem;
-using ShowComposer.Data;
-using ShowComposer.UserControls;
 using System.Xml.Serialization;
-using ShowComposer.Windows;
-using ShowComposer.NAudioDemo.AudioPlaybackDemo;
-using NAudio.CoreAudioApi;
-using NAudio.Wave;
 using Utilities;
 using SysIO = System.IO;
-using DocxReaderApplication;
 
 namespace ShowComposer
 {
@@ -39,32 +30,19 @@ namespace ShowComposer
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
-        static string[] audioExtensions = { ".WAV", ".MID", ".MIDI", ".WMA", ".MP3", ".OGG", ".RMA" };
-        static string[] videoExtensions = { ".AVI", ".MP4", ".DIVX", ".WMV" };
-        static string[] imageExtensions = { ".PNG", ".JPG", ".JPEG", ".BMP", ".GIF" };
-        static string[] presentExtensions = { ".ppt", ".pptx", ".pptm", ".potx", ".potm", ".pot", ".ppsx", ".ppsm", ".pps", ".ppam", ".ppa", ".odp" };
-
         public static IniFile iniFile;
 
         public static event EventHandler<LayoutEditorSelectionEventArgs> OnUIElementSelected = (Object sender, LayoutEditorSelectionEventArgs e) => { };
 
         private string m_IniPath = System.IO.Path.Combine(Environment.CurrentDirectory, "settings.ini");
-        private double m_OriginalLeft;
-        private double m_OriginalTop;
-        private double m_SnapSize = 10;
-        private bool m_IsDown;
-        private bool m_IsDragging;
         private bool m_IsSelected = false;
         private bool m_IsCtrlDown;
 
-        private GuideLine[] m_GuideLines;
         private UIElement m_SelectedElement = null;
-        private WindowsPoint m_StartPoint;
-
         private Layout m_Layout;
         private static string m_FileName = @"scenario 1.scomp";
         private List<UIElement> m_LoadedCanvasItems = new List<UIElement>();
-        LayoutProperties m_LayoutProperties;
+        private LayoutProperties m_LayoutProperties;
         private LayoutProperties LayoutProperties { set { m_LayoutProperties = value; MyDeskLayout.LayoutProperties = value; } get { return m_LayoutProperties; } }
         private bool m_IsNewProject;
         private ComposerLayout m_ComposerLayout;
@@ -73,6 +51,7 @@ namespace ShowComposer
         private Preferences m_Preferences;
 
         public static bool IsProjectLoaded { get; set; }
+
         public static string ProjectFileName
         {
             get { return m_FileName; }
@@ -126,7 +105,7 @@ namespace ShowComposer
 
             m_ComposerLayout = new ComposerLayout();
 
-            MyDeskLayout.myScrollViewer.ScrollChanged += dvScrollViewer_ScrollChanged;
+            MyDeskLayout.myScrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
             MyDeskLayout.ComposerLayout = m_ComposerLayout;
 
             SetProgressBarValue(ProgressBarLoading.Maximum, null);
@@ -202,7 +181,7 @@ namespace ShowComposer
 
             m_VolumeControlWindow?.Close();
             LoggingWindow.Quit();
-            SaveSettings();
+            SavePreferences();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -210,7 +189,7 @@ namespace ShowComposer
 
         }
 
-        private void dvScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             //myScrollViewer.ScrollToVerticalOffset(e.VerticalOffset);
             //FindVisualChild<ScrollViewer>(documentviewWord).ScrollToVerticalOffset(e.VerticalOffset);
@@ -367,6 +346,41 @@ namespace ShowComposer
             wnd.Show();
         }
 
+        private void MenuItemOptionsWindow_Click(object sender, RoutedEventArgs e)
+        {
+            var wnd = new OptionsWindow(new List<IOutputDevicePlugin>() {
+                new WasapiOutPlugin(),
+                new WaveOutPlugin(),
+                new DirectSoundOutPlugin(),
+                new NullOutPlugin()
+            });
+
+            wnd.ShowDialog();
+        }
+
+        private void MenuItemConsolidateProject_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("All media files will be moved on the one folder. Continue?", "", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                ConsolidateProject();
+            }
+        }
+
+        private void MenuItemResetWorkspace_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItemCloseProject_Click(sender, e);
+        }
+
+        private void MenuItemVolumeControlWindow_Click(object sender, RoutedEventArgs e)
+        {
+            if (m_VolumeControlWindow == null || !m_VolumeControlWindow.IsLoaded)
+            {
+                m_VolumeControlWindow = new VolumeControlWindow();
+                m_VolumeControlWindow.Show();
+                m_VolumeControlWindow.Focus();
+            }
+        }
+
         private void ButtonOpenScenario_Click(object sender, RoutedEventArgs e)
         {
             if (m_ComposerLayout.FrontSideLayout == null)
@@ -422,7 +436,6 @@ namespace ShowComposer
             }
         }
 
-
         private void SetProgressBarValue(object sender, EventArgs e)
         {
             var value = (double)sender;
@@ -436,49 +449,7 @@ namespace ShowComposer
         }
 
 
-        /// <summary>
-        ///  Convert the word document to xps document
-        /// </summary>
-        /// <param name="wordFilename">Word document Path</param>
-        /// <param name="xpsFilename">Xps document Path</param>
-        /// <returns></returns>
-        private XpsDocument ConvertWordToXps(string wordFilename, string xpsFilename)
-        {
-            // Create a WordApplication and host word document
-            /*Word.Application wordApp = new Microsoft.Office.Interop.Word.Application();
-            try
-            {
-                wordApp.Documents.Open(wordFilename);
-
-                // To Invisible the word document
-                wordApp.Application.Visible = false;
-
-                // Minimize the opened word document
-                wordApp.WindowState = WdWindowState.wdWindowStateMinimize;
-
-                Document doc = wordApp.ActiveDocument;
-
-                doc.SaveAs(xpsFilename, WdSaveFormat.wdFormatXPS);
-
-                XpsDocument xpsDocument = new XpsDocument(xpsFilename, FileAccess.Read);
-                return xpsDocument;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error occurs, The error message is  " + ex.ToString());
-                return null;
-            }
-            finally
-            {
-                try
-                {
-                    wordApp.Documents.Close();
-                    ((_Application)wordApp).Quit(WdSaveOptions.wdDoNotSaveChanges);
-                }
-                catch { };
-            }*/
-            return null;
-        }
+       
 
         private void ReadDocx(string path)
         {
@@ -494,38 +465,8 @@ namespace ShowComposer
                 }
         }
 
-        [Obsolete]
-        private int LoadWordDocToView(string wordDocument)
-        {
-            if (m_IsNewProject)
-            {
-                m_IsNewProject = false;
-                return 3;
-            }
-            if ((string.IsNullOrEmpty(wordDocument) || !File.Exists(wordDocument)) && !m_IsNewProject)
-            {
-                MessageBox.Show("The file (" + wordDocument + ") is invalid. Please select an existing file again.");
-                return 2;
-            }
-            else
-            {
-                string convertedXpsDoc = string.Concat(System.IO.Path.GetTempPath(), "\\", Guid.NewGuid().ToString(), ".xps");
-                XpsDocument xpsDocument = ConvertWordToXps(wordDocument, convertedXpsDoc);
-                if (xpsDocument == null)
-                {
-                    MessageBox.Show("Fatal error! Convertation Word document to XpsDocument failed!");
-                    return 1;
-                }
-
-                documentviewWord.Document = xpsDocument.GetFixedDocumentSequence();
-                xpsDocument.Close();
-
-            }
-            return 0;
-        }
-
-
-
+       
+        
         private void LoadProjectFileAsync(string p)
         {
             ProjectFileName = p;
@@ -583,17 +524,7 @@ namespace ShowComposer
             //if (OnSupplementLayoutLoaded != null)
             //    OnSupplementLayoutLoaded(this, EventArgs.Empty);
         }
-
-
-
-
-
-
-
-
-
-
-
+        
         #region Helpers
         public static bool InDesignMode()
         {
@@ -669,25 +600,9 @@ namespace ShowComposer
             return false;
         }
 
-        public bool IsAudioFile(string path)
-        {
-            return audioExtensions.Contains(System.IO.Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
-        }
+  
 
-        public bool IsVideoFile(string path)
-        {
-            return videoExtensions.Contains(System.IO.Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
-        }
 
-        public bool IsImageFile(string path)
-        {
-            return imageExtensions.Contains(System.IO.Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
-        }
-
-        public bool IsPresenterFile(string path)
-        {
-            return presentExtensions.Contains(System.IO.Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
-        }
         #endregion
 
 
@@ -701,7 +616,7 @@ namespace ShowComposer
                 fstreem.Close();
 
                 iniFile = new IniFile(m_IniPath);
-                SaveSettings();
+                SavePreferences();
             }
             else
             {
@@ -714,7 +629,7 @@ namespace ShowComposer
             m_Preferences = new Preferences(iniFile);
         }
 
-        private void SaveSettings()
+        private void SavePreferences()
         {
             try
             {
@@ -725,11 +640,153 @@ namespace ShowComposer
                 MessageBox.Show("Ошибка сохранения настроек. " + ex.Message, "Ошибка");
             }
         }
+        
+        
+
+        private void ConsolidateProject()
+        {
+            using (new WaitCursor())
+            {
+                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 10.0, null });
+
+                if (m_SampleDeskWindow != null)
+                    m_SampleDeskWindow.Close();
+
+                MenuItemSaveProject_Click(null, null);
+
+                try
+                {
+                    SysIO.File.Copy(
+                        ProjectFileName,
+                        SysIO.Path.Combine(
+                            SysIO.Path.GetDirectoryName(ProjectFileName),
+                            SysIO.Path.GetFileNameWithoutExtension(ProjectFileName) + "_bak" + SysIO.Path.GetExtension(ProjectFileName)));
+                }
+                catch { };
+
+                var mediaFolder = SysIO.Path.Combine(
+                    SysIO.Path.GetDirectoryName(ProjectFileName),
+                     SysIO.Path.GetFileNameWithoutExtension(ProjectFileName));
+
+                var di = SysIO.Directory.CreateDirectory(mediaFolder);
+
+                if (!di.Exists)
+                {
+                    MessageBox.Show("Error occurs. Can't create directory " + mediaFolder, "Ошибка");
+                    return;
+                }
+
+                for (var i = 0; i < m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo.Count; i++)
+                {
+                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo[i].AudioFile));
+                    try
+                    {
+                        SysIO.File.Copy(m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo[i].AudioFile, nf);
+                    }
+                    catch { };
+                    m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo[i].AudioFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo[i].AudioFile));
+                    m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo[i].IsRelativePath = true;
+                }
+
+                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 30.0, null });
+
+                for (var i = 0; i < m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo.Count; i++)
+                {
+                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo[i].VideoFile));
+                    try
+                    {
+                        SysIO.File.Copy(m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo[i].VideoFile, nf);
+                    }
+                    catch { };
+                    m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo[i].VideoFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo[i].VideoFile));
+                    m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo[i].IsRelativePath = true;
+                }
+
+                for (var i = 0; i < m_ComposerLayout.FrontSideLayout.m_PowerPointInfo.Count; i++)
+                {
+                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_PowerPointInfo[i].PresenterFile));
+                    try
+                    {
+                        SysIO.File.Copy(m_ComposerLayout.FrontSideLayout.m_PowerPointInfo[i].PresenterFile, nf);
+                    }
+                    catch { };
+                    m_ComposerLayout.FrontSideLayout.m_PowerPointInfo[i].PresenterFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_PowerPointInfo[i].PresenterFile));
+                    m_ComposerLayout.FrontSideLayout.m_PowerPointInfo[i].IsRelativePath = true;
+                }
+
+                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 50.0, null });
+
+                for (var i = 0; i < m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo.Count; i++)
+                {
+                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo[i].AudioFile));
+                    try
+                    {
+                        SysIO.File.Copy(m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo[i].AudioFile, nf);
+                    }
+                    catch { };
+                    m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo[i].AudioFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo[i].AudioFile));
+                    m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo[i].IsRelativePath = true;
+                }
+
+                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 65.0, null });
+
+                for (var i = 0; i < m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo.Count; i++)
+                {
+                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo[i].VideoFile));
+                    try
+                    {
+                        SysIO.File.Copy(m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo[i].VideoFile, nf);
+                    }
+                    catch { };
+                    m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo[i].VideoFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo[i].VideoFile));
+                    m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo[i].IsRelativePath = true;
+                }
+
+                for (var i = 0; i < m_ComposerLayout.RearSideLayout.m_PowerPointInfo.Count; i++)
+                {
+                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_PowerPointInfo[i].PresenterFile));
+                    try
+                    {
+                        SysIO.File.Copy(m_ComposerLayout.RearSideLayout.m_PowerPointInfo[i].PresenterFile, nf);
+                    }
+                    catch { };
+                    m_ComposerLayout.RearSideLayout.m_PowerPointInfo[i].PresenterFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_PowerPointInfo[i].PresenterFile));
+                    m_ComposerLayout.RearSideLayout.m_PowerPointInfo[i].IsRelativePath = true;
+                }
+
+                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 80.0, null });
 
 
 
+                m_ComposerLayout.Save();
+
+                MenuItemCloseProject_Click(null, null);
+
+                var ndf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(WordDocument));
+                if (SysIO.File.Exists(ndf))
+                {
+                    try { SysIO.File.Delete(ndf); }
+                    catch { };
+                    if (SysIO.File.Exists(ndf))
+                    {
+                        try { SysIO.File.Move(ndf, SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(WordDocument), "_renamed")); }
+                        catch { };
+                    }
+                }
+                try
+                {
+                    SysIO.File.Copy(WordDocument, ndf, true);
+                    WordDocument = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(WordDocument));
+                    m_ComposerLayout.FrontSideLayout.IsRelativePath = true;
+                }
+                catch { }
 
 
+                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 85.0, null });
+
+                LoadProjectFileAsync(ProjectFileName);
+            }
+        }
 
         #region Obsolete
         private void OnDocumentLoaded(DocumentViewer documentViewer)
@@ -887,6 +944,81 @@ namespace ShowComposer
 
         }
 
+        /// <summary>
+        ///  Convert the word document to xps document
+        /// </summary>
+        /// <param name="wordFilename">Word document Path</param>
+        /// <param name="xpsFilename">Xps document Path</param>
+        /// <returns></returns>
+        [Obsolete]
+        private XpsDocument ConvertWordToXps(string wordFilename, string xpsFilename)
+        {
+            // Create a WordApplication and host word document
+            /*Word.Application wordApp = new Microsoft.Office.Interop.Word.Application();
+            try
+            {
+                wordApp.Documents.Open(wordFilename);
+
+                // To Invisible the word document
+                wordApp.Application.Visible = false;
+
+                // Minimize the opened word document
+                wordApp.WindowState = WdWindowState.wdWindowStateMinimize;
+
+                Document doc = wordApp.ActiveDocument;
+
+                doc.SaveAs(xpsFilename, WdSaveFormat.wdFormatXPS);
+
+                XpsDocument xpsDocument = new XpsDocument(xpsFilename, FileAccess.Read);
+                return xpsDocument;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error occurs, The error message is  " + ex.ToString());
+                return null;
+            }
+            finally
+            {
+                try
+                {
+                    wordApp.Documents.Close();
+                    ((_Application)wordApp).Quit(WdSaveOptions.wdDoNotSaveChanges);
+                }
+                catch { };
+            }*/
+            return null;
+        }
+
+        [Obsolete]
+        private int LoadWordDocToView(string wordDocument)
+        {
+            if (m_IsNewProject)
+            {
+                m_IsNewProject = false;
+                return 3;
+            }
+            if ((string.IsNullOrEmpty(wordDocument) || !File.Exists(wordDocument)) && !m_IsNewProject)
+            {
+                MessageBox.Show("The file (" + wordDocument + ") is invalid. Please select an existing file again.");
+                return 2;
+            }
+            else
+            {
+                string convertedXpsDoc = string.Concat(System.IO.Path.GetTempPath(), "\\", Guid.NewGuid().ToString(), ".xps");
+                XpsDocument xpsDocument = ConvertWordToXps(wordDocument, convertedXpsDoc);
+                if (xpsDocument == null)
+                {
+                    MessageBox.Show("Fatal error! Convertation Word document to XpsDocument failed!");
+                    return 1;
+                }
+
+                documentviewWord.Document = xpsDocument.GetFixedDocumentSequence();
+                xpsDocument.Close();
+
+            }
+            return 0;
+        }
+
         [Obsolete]
         public void SaveLayout()
         {
@@ -926,185 +1058,5 @@ namespace ShowComposer
             return eventDelegate;
         }
         #endregion
-
-        private void MenuItemOptionsWindow_Click(object sender, RoutedEventArgs e)
-        {
-            var wnd = new OptionsWindow(new List<IOutputDevicePlugin>() {
-                new WasapiOutPlugin(),
-                new WaveOutPlugin(),
-                new DirectSoundOutPlugin(),
-                new NullOutPlugin()
-            });
-
-            wnd.ShowDialog();
-        }
-
-        private void MenuItemConsolidateProject_Click(object sender, RoutedEventArgs e)
-        {
-            if (MessageBox.Show("All media files will be moved on the one folder. Continue?", "", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-            {
-                ConsolidateProject();
-            }
-        }
-
-        private void ConsolidateProject()
-        {
-            using (new WaitCursor())
-            {
-                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 10.0, null });
-
-                if (m_SampleDeskWindow != null)
-                    m_SampleDeskWindow.Close();
-
-                MenuItemSaveProject_Click(null, null);
-
-                try
-                {
-                    SysIO.File.Copy(
-                        ProjectFileName,
-                        SysIO.Path.Combine(
-                            SysIO.Path.GetDirectoryName(ProjectFileName),
-                            SysIO.Path.GetFileNameWithoutExtension(ProjectFileName) + "_bak" + SysIO.Path.GetExtension(ProjectFileName)));
-                }
-                catch { };
-
-                var mediaFolder = SysIO.Path.Combine(
-                    SysIO.Path.GetDirectoryName(ProjectFileName),
-                     SysIO.Path.GetFileNameWithoutExtension(ProjectFileName));
-
-                var di = SysIO.Directory.CreateDirectory(mediaFolder);
-
-                if (!di.Exists)
-                {
-                    MessageBox.Show("Error occurs. Can't create directory " + mediaFolder, "Ошибка");
-                    return;
-                }
-
-                for (var i = 0; i < m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo.Count; i++)
-                {
-                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo[i].AudioFile));
-                    try
-                    {
-                        SysIO.File.Copy(m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo[i].AudioFile, nf);
-                    }
-                    catch { };
-                    m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo[i].AudioFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo[i].AudioFile));
-                    m_ComposerLayout.FrontSideLayout.m_AudioPlayerInfo[i].IsRelativePath = true;
-                }
-
-                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 30.0, null });
-
-                for (var i = 0; i < m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo.Count; i++)
-                {
-                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo[i].VideoFile));
-                    try
-                    {
-                        SysIO.File.Copy(m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo[i].VideoFile, nf);
-                    }
-                    catch { };
-                    m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo[i].VideoFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo[i].VideoFile));
-                    m_ComposerLayout.FrontSideLayout.m_VideoPlayerInfo[i].IsRelativePath = true;
-                }
-
-                for (var i = 0; i < m_ComposerLayout.FrontSideLayout.m_PowerPointInfo.Count; i++)
-                {
-                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_PowerPointInfo[i].PresenterFile));
-                    try
-                    {
-                        SysIO.File.Copy(m_ComposerLayout.FrontSideLayout.m_PowerPointInfo[i].PresenterFile, nf);
-                    }
-                    catch { };
-                    m_ComposerLayout.FrontSideLayout.m_PowerPointInfo[i].PresenterFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.FrontSideLayout.m_PowerPointInfo[i].PresenterFile));
-                    m_ComposerLayout.FrontSideLayout.m_PowerPointInfo[i].IsRelativePath = true;
-                }
-
-                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 50.0, null });
-
-                for (var i = 0; i < m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo.Count; i++)
-                {
-                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo[i].AudioFile));
-                    try
-                    {
-                        SysIO.File.Copy(m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo[i].AudioFile, nf);
-                    }
-                    catch { };
-                    m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo[i].AudioFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo[i].AudioFile));
-                    m_ComposerLayout.RearSideLayout.m_AudioPlayerInfo[i].IsRelativePath = true;
-                }
-
-                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 65.0, null });
-
-                for (var i = 0; i < m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo.Count; i++)
-                {
-                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo[i].VideoFile));
-                    try
-                    {
-                        SysIO.File.Copy(m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo[i].VideoFile, nf);
-                    }
-                    catch { };
-                    m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo[i].VideoFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo[i].VideoFile));
-                    m_ComposerLayout.RearSideLayout.m_VideoPlayerInfo[i].IsRelativePath = true;
-                }
-
-                for (var i = 0; i < m_ComposerLayout.RearSideLayout.m_PowerPointInfo.Count; i++)
-                {
-                    var nf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_PowerPointInfo[i].PresenterFile));
-                    try
-                    {
-                        SysIO.File.Copy(m_ComposerLayout.RearSideLayout.m_PowerPointInfo[i].PresenterFile, nf);
-                    }
-                    catch { };
-                    m_ComposerLayout.RearSideLayout.m_PowerPointInfo[i].PresenterFile = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(m_ComposerLayout.RearSideLayout.m_PowerPointInfo[i].PresenterFile));
-                    m_ComposerLayout.RearSideLayout.m_PowerPointInfo[i].IsRelativePath = true;
-                }
-
-                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 80.0, null });
-
-
-
-                m_ComposerLayout.Save();
-
-                MenuItemCloseProject_Click(null, null);
-
-                var ndf = SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(WordDocument));
-                if (SysIO.File.Exists(ndf))
-                {
-                    try { SysIO.File.Delete(ndf); }
-                    catch { };
-                    if (SysIO.File.Exists(ndf))
-                    {
-                        try { SysIO.File.Move(ndf, SysIO.Path.Combine(mediaFolder, SysIO.Path.GetFileName(WordDocument), "_renamed")); }
-                        catch { };
-                    }
-                }
-                try
-                {
-                    SysIO.File.Copy(WordDocument, ndf, true);
-                    WordDocument = SysIO.Path.Combine(SysIO.Path.GetFileNameWithoutExtension(ProjectFileName), SysIO.Path.GetFileName(WordDocument));
-                    m_ComposerLayout.FrontSideLayout.IsRelativePath = true;
-                }
-                catch { }
-
-
-                Dispatcher.Invoke(new EventHandler(SetProgressBarValue), new object[] { 85.0, null });
-
-                LoadProjectFileAsync(ProjectFileName);
-            }
-        }
-
-        private void MenuItemResetWorkspace_Click(object sender, RoutedEventArgs e)
-        {
-            MenuItemCloseProject_Click(sender, e);
-        }
-
-        private void MenuItemVolumeControlWindow_Click(object sender, RoutedEventArgs e)
-        {
-            if (m_VolumeControlWindow == null || !m_VolumeControlWindow.IsLoaded)
-            {
-                m_VolumeControlWindow = new VolumeControlWindow();
-                m_VolumeControlWindow.Show();
-                m_VolumeControlWindow.Focus();
-            }
-        }
     }
 }

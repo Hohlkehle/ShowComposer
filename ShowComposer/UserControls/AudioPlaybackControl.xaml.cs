@@ -7,24 +7,13 @@ using ShowComposer.DraggableUI;
 using ShowComposer.NAudioDemo.AudioPlaybackDemo;
 using ShowComposer.Windows;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Common;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace ShowComposer.UserControls
@@ -37,21 +26,16 @@ namespace ShowComposer.UserControls
         public static event EventHandler OnTryPlay, OnPlay, OnStop;
         public event EventHandler OnRemove;
         private IWavePlayer waveOut;
-
-      
         private string m_AudioFile = null;
         private WaveStream audioFileReader;
-
-      
         private Action<float> InvokeSetVolumeDelegate;
-        // Create a Object of BackgroundWorker Class
         private BackgroundWorker WorkerThread = new BackgroundWorker();
-        DispatcherTimer dispatcherTimer;
-        IOutputDevicePlugin SelectedOutputDevicePlugin;
-        bool sliderSeekdragStarted;
-        DateTime sliderSeekMouseDownStart;
-        bool m_IsExclusivePlayback = false;
-        bool m_IsRelativePath;
+        private DispatcherTimer dispatcherTimer;
+        private IOutputDevicePlugin SelectedOutputDevicePlugin;
+        private bool sliderSeekdragStarted;
+        private DateTime sliderSeekMouseDownStart;
+        private bool m_IsExclusivePlayback = false;
+        private bool m_IsRelativePath;
 
         public IWavePlayer WaveOutPlayer
         {
@@ -82,6 +66,7 @@ namespace ShowComposer.UserControls
                     : new SolidColorBrush(Color.FromArgb(200, 20, 20, 24));
             }
         }
+
         public ICommand PlayCommand { get; private set; }
 
         public ICommand StopCommand { get; private set; }
@@ -924,9 +909,7 @@ namespace ShowComposer.UserControls
         {
 
         }
-
-
-
+        
         private void OnOpenFileClick(object sender, EventArgs e)
         {
             var openFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -939,8 +922,7 @@ namespace ShowComposer.UserControls
             }
         }
 
-
-        private void myGrid_DragEnter(object sender, DragEventArgs e)
+        private void Grid_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -956,13 +938,13 @@ namespace ShowComposer.UserControls
                 e.Effects = DragDropEffects.None; // Unknown data, ignore it
         }
 
-        private void myGrid_DragLeave(object sender, DragEventArgs e)
+        private void Grid_DragLeave(object sender, DragEventArgs e)
         {
             //myScrollViewer.AllowDrop = false;
             //myScrollViewer.IsHitTestVisible = false;
         }
 
-        private void myGrid_Drop(object sender, DragEventArgs e)
+        private void Grid_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -1002,7 +984,6 @@ namespace ShowComposer.UserControls
             AudioFile = file;
             //ButtonPlayCommand_Click(this, null);
         }
-
 
         private void SliderSeek_ThumbDragCompleted(object sender, DragCompletedEventArgs e)
         {
@@ -1081,10 +1062,7 @@ namespace ShowComposer.UserControls
         {
             return c1 + ((x - a1) / (a2 - a1)) * (c2 - c1) / 1.0f;
         }
-
-
-
-
+        
         ~AudioPlaybackControl()
         {
             MainWindow.OnUIElementSelected -= MainWindow_OnUIElementSelected;
@@ -1134,7 +1112,6 @@ namespace ShowComposer.UserControls
                 OnRemove(this, e);
             }
         }
-
 
         private void AudioPlaybackExclusive_Checked(object sender, RoutedEventArgs e)
         {

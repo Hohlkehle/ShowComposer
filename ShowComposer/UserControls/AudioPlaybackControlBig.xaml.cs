@@ -9,21 +9,13 @@ using ShowComposer.Windows;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace ShowComposer.UserControls
@@ -494,8 +486,9 @@ namespace ShowComposer.UserControls
 
 
             byte[] buffer1 = new byte[4096];
-            int reader = 0;
+            
             var memoryStream = new System.IO.MemoryStream();
+            //int reader = 0;
             //while ((reader = _audioFileReader.Read(buffer1, 0, buffer1.Length)) != 0)
             //    memoryStream.Write(buffer1, 0, reader);
             int saplesCount = (int)(_audioFileReader.TotalTime.TotalSeconds * sampleChannel.WaveFormat.SampleRate * sampleChannel.WaveFormat.Channels);

@@ -1,4 +1,5 @@
-﻿using ShowComposer.DraggableUI;
+﻿using ShowComposer.Core;
+using ShowComposer.DraggableUI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,7 +24,7 @@ namespace ShowComposer.UserControls
     /// </summary>
     public partial class PowerPointControl : UserControl, IDraggableUIElement
     {
-        public static event EventHandler OnPlay, OnStop;
+        public static event EventHandler OnPlay;
         public event EventHandler OnRemove;
 
         private DispatcherTimer dispatcherTimer;
@@ -204,9 +205,7 @@ namespace ShowComposer.UserControls
             ButtonPlayCommand.Visibility = System.Windows.Visibility.Collapsed;
             ButtonPauseCommand.Visibility = System.Windows.Visibility.Visible;
 
-
-            if (OnPlay != null)
-                OnPlay(this, EventArgs.Empty);
+            OnPlay?.Invoke(this, EventArgs.Empty);
         }
 
         private void ButtonPauseCommand_Click(object sender, RoutedEventArgs e)
@@ -231,7 +230,7 @@ namespace ShowComposer.UserControls
         private void OnOpenFileClick(object sender, EventArgs e)
         {
             var openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            string allExtensions = "*" + string.Join(";*", DeskLayout.presentExtensions);
+            string allExtensions = "*" + string.Join(";*", CommandHelper.presentExtensions);
             openFileDialog.Filter = String.Format("All Supported Files|{0}|All Files (*.*)|*.*", allExtensions);
             openFileDialog.FilterIndex = 1;
             if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)

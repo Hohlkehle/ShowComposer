@@ -1,74 +1,51 @@
-﻿using QuirkSoft.VirtualVolumeKnob;
+﻿using CoreAudioApi;
+using QuirkSoft.VirtualVolumeKnob;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using gma.System.Windows;
-using CoreAudioApi;
-using System.Threading;
-using Utilities;
 using System.IO;
+using System.Windows.Forms;
+using Utilities;
 
 namespace QuirkSoft
 {
     public partial class MainForm : Form
     {
+        private readonly MMDevice m_device;
         public static MainForm instance;
         public static IniFile iniFile;
         public event EventHandler VolumeChanged;
-        string m_IniPath = Path.Combine(Environment.CurrentDirectory, "settings.ini");
-        public float sensDivider = 1000f;
-        SystemVolumeController m_SystemVolumeController;
-        UserActivityHook actHook;
-        bool _controlDown;
-        Point _mouseLastPos;
-        private readonly MMDevice m_device;
-        int sldVolume;
-        DateTime _currentTime;
-        float _timeDelta;
-        TimeSpan time;
-        CursorData cursor;
-        bool m_IsHorizontal { get { return m_Preferences.Axis.Value == 1; } }
-        Preferences m_Preferences;
+
+        private string m_IniPath = Path.Combine(Environment.CurrentDirectory, "settings.ini");
+        private Preferences m_Preferences;
+        private SystemVolumeController m_SystemVolumeController;
+        private Point m_MouseLastPos;
+        private CursorData m_CursorData;
+        private float m_SensDivider = 1000f;
+        private int m_SoundVolume;
+        private DateTime m_CurrentTime;
+        private float m_TimeDelta;
+        private TimeSpan m_WholeTime;
+        private bool m_IsHorizontal { get { return m_Preferences.Axis.Value == 1; } }
 
         public MainForm()
         {
             instance = this;
-            cursor = new CursorData();
+            m_CursorData = new CursorData();
 
             IniFileInit();
             InitializeComponent();
 
             #region CoreAudioApi initialization
-
             MMDeviceEnumerator devEnum = new MMDeviceEnumerator();
             m_device = devEnum.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
-            sldVolume = (int)(m_device.AudioEndpointVolume.MasterVolumeLevelScalar * 100);
+            m_SoundVolume = (int)(m_device.AudioEndpointVolume.MasterVolumeLevelScalar * 100);
             m_device.AudioEndpointVolume.OnVolumeNotification += new AudioEndpointVolumeNotificationDelegate(AudioEndpointVolume_OnVolumeNotification);
             #endregion
 
             LoadPreferences();
 
             m_SystemVolumeController = new SystemVolumeController();
-            try
-            {
-                //actHook = new UserActivityHook(); // crate an instance with global hooks
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-            }
-
-            // hang on events
-            //   actHook.OnMouseActivity += new MouseEventHandler(MouseMoved);
-            //   actHook.KeyDown += new KeyEventHandler(MyKeyDown);
-            //   actHook.KeyPress += new KeyPressEventHandler(MyKeyPress);
-            //   actHook.KeyUp += new KeyEventHandler(MyKeyUp);
+           
             VolumeChanged += MainForm_VolumeChanged;
             timer1.Start();
         }
@@ -154,146 +131,51 @@ namespace QuirkSoft
         {
             try
             {
-
-
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
         }
-
-        [Obsolete]
-        private void MyKeyPress(object sender, KeyPressEventArgs e)
-        {
-            //throw new NotImplementedException();
-        }
-        [Obsolete]
-        private void MyKeyUp(object sender, KeyEventArgs e)
-        {
-
-            if (e.KeyCode == Keys.LControlKey)
-            {
-                _controlDown = false;
-            }
-        }
-        [Obsolete]
-        private void MyKeyDown(object sender, KeyEventArgs e)
-        {
-
-            if (e.KeyCode == Keys.LControlKey)
-            {
-                _controlDown = true;
-            }
-        }
-        [Obsolete]
-        private void MouseMoved(object sender, MouseEventArgs e)
-        {
-            if (_controlDown)
-            {
-                Win32Wrap.POINT p = new Win32Wrap.POINT();
-                Win32Wrap.ClientToScreen(this.Handle, ref p);
-
-                //Cursor.Position = new Point(Cursor.Position.X - 50, Cursor.Position.Y - 50);
-                //Cursor.Clip = new Rectangle(this.Location, this.Size);
-
-                int mouseX = Cursor.Position.X;// e.X;
-                int mouseY = Cursor.Position.Y;//e.Y;
-                int screenX = Screen.PrimaryScreen.Bounds.Width;
-                int screenY = Screen.PrimaryScreen.Bounds.Height;
-
-                labelCursorPos.Text = Cursor.Position.X + ":" + Cursor.Position.Y;
-                //labelCursorPos.Text = mouseX + ":" + mouseY;
-
-                if (mouseX <= 0)
-                {
-
-
-                    //Win32Wrap.SetCursorPos(screenX - 10, mouseY);
-
-                }
-                if (mouseX >= screenX - 1)
-                {
-                    Cursor.Position = new Point(0, mouseY);
-                    //Win32Wrap.SetCursorPos(0, mouseY);
-
-                }
-
-
-                if (mouseY <= 0)
-                {
-                    Cursor.Position = new Point(mouseX, screenY - 10);
-                }
-                if (mouseY >= screenY - 1)
-                {
-                    Cursor.Position = new Point(mouseX, 0);
-                }
-
-                //if (mouseX < 0 || mouseX > screenX || mouseY < 0 || mouseY > screenY)
-                //    return;
-
-
-
-                var dX = _mouseLastPos.X - e.X;
-                var dY = _mouseLastPos.Y - e.Y;
-
-                float sns = 10 / 1000f;
-
-                // richTextBox1.AppendText("MX" + (mouseX) + ";MY" + (mouseY) + ";DX" + (dX) + ";DY" + (dY) + "[" + 1 / time.TotalMilliseconds + "]" + "\n\r");
-                var vol = m_device.AudioEndpointVolume.MasterVolumeLevelScalar;
-                if (dY > 0)
-                {
-                    m_device.AudioEndpointVolume.MasterVolumeLevelScalar = MathHelper.Lerp(vol, vol + dY, sns * _timeDelta);
-                }
-                else
-                {
-                    m_device.AudioEndpointVolume.MasterVolumeLevelScalar = MathHelper.Lerp(vol, vol + dY, sns * _timeDelta);
-                }
-            }
-            _mouseLastPos = new Point(e.X, e.Y);
-            time = (DateTime.Now - _currentTime);
-            _timeDelta = (float)(1f / time.TotalMilliseconds);
-            _currentTime = DateTime.Now;
-        }
-
-        private void buttonVolUp_Click(object sender, EventArgs e)
+        
+        private void ButtonVolUp_Click(object sender, EventArgs e)
         {
             m_SystemVolumeController.VolUp();
         }
 
-        private void buttonVolDown_Click(object sender, EventArgs e)
+        private void ButtonVolDown_Click(object sender, EventArgs e)
         {
             m_SystemVolumeController.VolDown();
         }
 
-        private void buttonMute_Click(object sender, EventArgs e)
+        private void ButtonMute_Click(object sender, EventArgs e)
         {
             m_SystemVolumeController.Mute();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             Cursor.Position = new Point(1000, 256);
         }
 
         private void GlobalMouseMove(object sender, MouseEventArgs e)
         {
-            labelCursorPos.Text = cursor.Position.X + ":" + cursor.Position.Y;
+            labelCursorPos.Text = m_CursorData.Position.X + ":" + m_CursorData.Position.Y;
 
             if ((Control.ModifierKeys & (Keys)(m_Preferences.Modifier.Value)) != 0)
             {
-                float sns = trackBarSens.Value / sensDivider;
+                float sns = trackBarSens.Value / m_SensDivider;
                 int mouseX = e.X;
                 int mouseY = e.Y;
                 int screenX = Screen.PrimaryScreen.Bounds.Width;
                 int screenY = Screen.PrimaryScreen.Bounds.Height;
-                int dX = cursor.DeltaX;
-                int dY = cursor.DeltaY;
+                int dX = m_CursorData.DeltaX;
+                int dY = m_CursorData.DeltaY;
 
                 if (m_IsHorizontal)
                 {
-                    dX = -cursor.DeltaY;
-                    dY = -cursor.DeltaX;
+                    dX = -m_CursorData.DeltaY;
+                    dY = -m_CursorData.DeltaX;
                 }
 
                 if (mouseX <= 0)
@@ -316,26 +198,26 @@ namespace QuirkSoft
                 // richTextBox1.AppendText("MX" + (mouseX) + ";MY" + (mouseY) + ";DX" + (dX) + ";DY" + (dY) + "[" + 1 / time.TotalMilliseconds + "]" + "\n\r");
                 var vol = m_device.AudioEndpointVolume.MasterVolumeLevelScalar;
 
-                m_device.AudioEndpointVolume.MasterVolumeLevelScalar = MathHelper.Clamp01(MathHelper.Lerp(vol, vol + dY, sns * _timeDelta));
+                m_device.AudioEndpointVolume.MasterVolumeLevelScalar = MathHelper.Clamp01(MathHelper.Lerp(vol, vol + dY, sns * m_TimeDelta));
 
                 if (VolumeChanged != null)
                     VolumeChanged(this, null);
             }
-            _mouseLastPos = new Point(e.X, e.Y);
-            time = (DateTime.Now - _currentTime);
-            _timeDelta = (float)(1f / time.TotalMilliseconds);
-            _currentTime = DateTime.Now;
+            m_MouseLastPos = new Point(e.X, e.Y);
+            m_WholeTime = (DateTime.Now - m_CurrentTime);
+            m_TimeDelta = (float)(1f / m_WholeTime.TotalMilliseconds);
+            m_CurrentTime = DateTime.Now;
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
-            cursor.DeltaX = cursor.Position.X - Cursor.Position.X;
-            cursor.DeltaY = cursor.Position.Y - Cursor.Position.Y;
-            if (cursor.Position != Cursor.Position)
+            m_CursorData.DeltaX = m_CursorData.Position.X - Cursor.Position.X;
+            m_CursorData.DeltaY = m_CursorData.Position.Y - Cursor.Position.Y;
+            if (m_CursorData.Position != Cursor.Position)
             {
-                GlobalMouseMove(this, new MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, Cursor.Position.X, Cursor.Position.Y, cursor.DeltaX + cursor.DeltaY));
+                GlobalMouseMove(this, new MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, Cursor.Position.X, Cursor.Position.Y, m_CursorData.DeltaX + m_CursorData.DeltaY));
             }
-            cursor.Position = Cursor.Position;
+            m_CursorData.Position = Cursor.Position;
             LateUpdate();
         }
 
@@ -352,7 +234,7 @@ namespace QuirkSoft
             labelVolumeLevel.Text = value.ToString();
         }
 
-        private void trackBarSens_Scroll(object sender, EventArgs e)
+        private void TrackBarSens_Scroll(object sender, EventArgs e)
         {
             labelSensValue.Text = trackBarSens.Value.ToString();
             m_Preferences.Sensitivity.Value = trackBarSens.Value;
@@ -363,7 +245,7 @@ namespace QuirkSoft
             m_Preferences.Axis.Value = radioButtonVerticalAxis.Checked ? 0 : 1;
         }
 
-        private void radioButtonModCtrl_CheckedChanged(object sender, EventArgs e)
+        private void RadioButtonModCtrl_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonModCtrl.Checked)
             {
@@ -371,7 +253,7 @@ namespace QuirkSoft
             }
         }
 
-        private void radioButtonModAlt_CheckedChanged(object sender, EventArgs e)
+        private void RadioButtonModAlt_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonModAlt.Checked)
             {
@@ -379,7 +261,7 @@ namespace QuirkSoft
             }
         }
 
-        private void radioButtonModShift_CheckedChanged(object sender, EventArgs e)
+        private void RadioButtonModShift_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonModShift.Checked)
             {
@@ -392,19 +274,19 @@ namespace QuirkSoft
             SaveSettings();
         }
 
-        private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void ExitToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void buttonClose_Click(object sender, EventArgs e)
+        private void ButtonClose_Click(object sender, EventArgs e)
         {
             this.Hide();
             this.WindowState = FormWindowState.Minimized;
             this.Close();
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (timer1.Enabled)
             {
@@ -418,7 +300,7 @@ namespace QuirkSoft
             }
         }
 
-        private void exitToolStripMenuItem2_Click(object sender, EventArgs e)
+        private void ExitToolStripMenuItem2_Click(object sender, EventArgs e)
         {
             this.Close();
         }
@@ -438,7 +320,7 @@ namespace QuirkSoft
             }
         }
 
-        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void NotifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (FormWindowState.Minimized == this.WindowState)
             {
@@ -457,7 +339,5 @@ namespace QuirkSoft
                 this.WindowState = FormWindowState.Minimized;
             }
         }
-
-
     }
 }

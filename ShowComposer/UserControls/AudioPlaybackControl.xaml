@@ -534,7 +534,7 @@
 
     </UserControl.Resources>
 
-    <Grid Margin="0,0,0,0" Height="27" VerticalAlignment="Top" HorizontalAlignment="Left" Width="30" DragEnter="myGrid_DragEnter" DragLeave="myGrid_DragLeave" Drop="myGrid_Drop">
+    <Grid Margin="0,0,0,0" Height="27" VerticalAlignment="Top" HorizontalAlignment="Left" Width="30" DragEnter="Grid_DragEnter" DragLeave="Grid_DragLeave" Drop="Grid_Drop">
         <Grid.ContextMenu>
             <ContextMenu>
                 <MenuItem Header="_Properties" x:Name="AudioPlaybackShowProperties" Click="AudioPlaybackShowProperties_Click"/>
@@ -545,7 +545,7 @@
             </ContextMenu>
         </Grid.ContextMenu>
    
-        <Border x:Name="BorderContour" Background="#CC1a8cff" BorderThickness="2" Visibility="Visible" Margin="2,26,-414,-27"/>
+        <Border x:Name="BorderContour" Background="#CC1a8cff" BorderThickness="2" Visibility="Hidden" Margin="2,26,-414,-27"/>
         <Border x:Name="BorderBackground" BorderThickness="1,1,1,1" Margin="8,30,-416,-24" Background="#C8141418" Cursor="SizeAll" />
 
         <Gui:VolumeMeter x:Name="volumeMeter1" HorizontalAlignment="Left" Height="51" Margin="10,10,-19,-34" VerticalAlignment="Top" Width="39"/>

@@ -80,7 +80,7 @@
             this.buttonVolUp.TabIndex = 0;
             this.buttonVolUp.Text = "Vol Up";
             this.buttonVolUp.UseVisualStyleBackColor = true;
-            this.buttonVolUp.Click += new System.EventHandler(this.buttonVolUp_Click);
+            this.buttonVolUp.Click += new System.EventHandler(this.ButtonVolUp_Click);
             // 
             // buttonVolDown
             // 
@@ -90,7 +90,7 @@
             this.buttonVolDown.TabIndex = 1;
             this.buttonVolDown.Text = "Vol Down";
             this.buttonVolDown.UseVisualStyleBackColor = true;
-            this.buttonVolDown.Click += new System.EventHandler(this.buttonVolDown_Click);
+            this.buttonVolDown.Click += new System.EventHandler(this.ButtonVolDown_Click);
             // 
             // buttonMute
             // 
@@ -100,7 +100,7 @@
             this.buttonMute.TabIndex = 2;
             this.buttonMute.Text = "Mute";
             this.buttonMute.UseVisualStyleBackColor = true;
-            this.buttonMute.Click += new System.EventHandler(this.buttonMute_Click);
+            this.buttonMute.Click += new System.EventHandler(this.ButtonMute_Click);
             // 
             // labelCursorPos
             // 
@@ -114,7 +114,7 @@
             // timer1
             // 
             this.timer1.Interval = 6;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // trackBarSens
             // 
@@ -125,7 +125,7 @@
             this.trackBarSens.Size = new System.Drawing.Size(131, 45);
             this.trackBarSens.TabIndex = 8;
             this.trackBarSens.Value = 50;
-            this.trackBarSens.Scroll += new System.EventHandler(this.trackBarSens_Scroll);
+            this.trackBarSens.Scroll += new System.EventHandler(this.TrackBarSens_Scroll);
             // 
             // labelSensValue
             // 
@@ -177,7 +177,7 @@
             this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
             this.notifyIcon1.Text = "notifyIcon1";
             this.notifyIcon1.Visible = true;
-            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
+            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIcon1_MouseDoubleClick);
             // 
             // contextMenuStrip1
             // 
@@ -192,7 +192,7 @@
             this.exitToolStripMenuItem2.Name = "exitToolStripMenuItem2";
             this.exitToolStripMenuItem2.Size = new System.Drawing.Size(92, 22);
             this.exitToolStripMenuItem2.Text = "Exit";
-            this.exitToolStripMenuItem2.Click += new System.EventHandler(this.exitToolStripMenuItem2_Click);
+            this.exitToolStripMenuItem2.Click += new System.EventHandler(this.ExitToolStripMenuItem2_Click);
             // 
             // groupBox2
             // 
@@ -226,7 +226,7 @@
             this.radioButtonModShift.Size = new System.Drawing.Size(14, 13);
             this.radioButtonModShift.TabIndex = 4;
             this.radioButtonModShift.UseVisualStyleBackColor = true;
-            this.radioButtonModShift.CheckedChanged += new System.EventHandler(this.radioButtonModShift_CheckedChanged);
+            this.radioButtonModShift.CheckedChanged += new System.EventHandler(this.RadioButtonModShift_CheckedChanged);
             // 
             // labelAlt
             // 
@@ -245,7 +245,7 @@
             this.radioButtonModAlt.Size = new System.Drawing.Size(14, 13);
             this.radioButtonModAlt.TabIndex = 2;
             this.radioButtonModAlt.UseVisualStyleBackColor = true;
-            this.radioButtonModAlt.CheckedChanged += new System.EventHandler(this.radioButtonModAlt_CheckedChanged);
+            this.radioButtonModAlt.CheckedChanged += new System.EventHandler(this.RadioButtonModAlt_CheckedChanged);
             // 
             // labelCtrl
             // 
@@ -266,7 +266,7 @@
             this.radioButtonModCtrl.TabIndex = 0;
             this.radioButtonModCtrl.TabStop = true;
             this.radioButtonModCtrl.UseVisualStyleBackColor = true;
-            this.radioButtonModCtrl.CheckedChanged += new System.EventHandler(this.radioButtonModCtrl_CheckedChanged);
+            this.radioButtonModCtrl.CheckedChanged += new System.EventHandler(this.RadioButtonModCtrl_CheckedChanged);
             // 
             // groupBox3
             // 
@@ -337,7 +337,7 @@
             this.buttonClose.TabIndex = 16;
             this.buttonClose.Text = "Close";
             this.buttonClose.UseVisualStyleBackColor = true;
-            this.buttonClose.Click += new System.EventHandler(this.buttonClose_Click);
+            this.buttonClose.Click += new System.EventHandler(this.ButtonClose_Click);
             // 
             // menuStrip1
             // 
@@ -364,14 +364,14 @@
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
             this.exitToolStripMenuItem.Text = "Pause";
-            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem1
             // 
             this.exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
             this.exitToolStripMenuItem1.Size = new System.Drawing.Size(105, 22);
             this.exitToolStripMenuItem1.Text = "Exit";
-            this.exitToolStripMenuItem1.Click += new System.EventHandler(this.exitToolStripMenuItem1_Click);
+            this.exitToolStripMenuItem1.Click += new System.EventHandler(this.ExitToolStripMenuItem1_Click);
             // 
             // verticalProgressBar1
             // 
