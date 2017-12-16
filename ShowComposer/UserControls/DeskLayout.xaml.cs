@@ -92,6 +92,7 @@ namespace ShowComposer.UserControls
 
         public IEnumerable<AudioPlaybackControl> AudioControls { get { return myCanvas.Children.OfType<ShowComposer.UserControls.AudioPlaybackControl>(); } }
         public IEnumerable<VideoPlaybackControl> VideoControls { get { return myCanvas.Children.OfType<ShowComposer.UserControls.VideoPlaybackControl>(); } }
+        public IEnumerable<PowerPointControl> PowerPointControls { get { return myCanvas.Children.OfType<ShowComposer.UserControls.PowerPointControl>(); } }
 
         public DeskLayout()
         {
@@ -213,6 +214,9 @@ namespace ShowComposer.UserControls
         /// <param name="e"></param>
         void MyCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (e.OriginalSource is System.Windows.Shapes.Ellipse)
+                return;
+
             if (m_IsSelected)
             {
                 m_IsSelected = false;
@@ -560,7 +564,21 @@ namespace ShowComposer.UserControls
             CommandHelper.Log(string.Format("Calculated position for new element: {0}", position));
         }
 
-      
+        public int IndexOf(UserControl control)
+        {
+            int i = -1;
+            if(control is AudioPlaybackControl)
+            {
+                i = CommandHelper.IndexOf<AudioPlaybackControl>(AudioControls, (AudioPlaybackControl)control);
+            } else if (control is VideoPlaybackControl)
+            {
+                i = CommandHelper.IndexOf<VideoPlaybackControl>(VideoControls, (VideoPlaybackControl)control);
+            } else if (control is PowerPointControl)
+            {
+                i = CommandHelper.IndexOf<PowerPointControl>(PowerPointControls, (PowerPointControl)control);
+            }
+            return i;
+        }
 
         public void ClearLayout()
         {
@@ -631,6 +649,7 @@ namespace ShowComposer.UserControls
         }
 
         #region Helpers
+       
         private childItem FindVisualChild<childItem>(DependencyObject obj) where childItem : DependencyObject
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)

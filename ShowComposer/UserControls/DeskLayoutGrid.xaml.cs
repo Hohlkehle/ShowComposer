@@ -33,6 +33,7 @@ namespace ShowComposer.UserControls
         private int m_KeyPressed = 1;
         private int m_KeyPressDelay = 3000000;
         private long m_KeyDownTime;
+        private int m_GridMargin = 14;
         private static readonly UserActivityHook actHook = new UserActivityHook();
         //private static readonly globalKeyboardHook gkh = new globalKeyboardHook();
         //private GlobalKeyboardController m_GlobalKeyboardController;
@@ -89,7 +90,7 @@ namespace ShowComposer.UserControls
                         Point relativeLocation = this.TranslatePoint(new Point(0, mp.Y + m_GridHeight + topMargin), MyGrid);
 
                         var p = MyGrid.GetColumnRow(new Point(0, mp.Y));
-                        Canvas.SetTop(m_SelectedElement, p.Y * m_GridHeight);
+                        Canvas.SetTop(m_SelectedElement, p.Y * m_GridHeight - m_GridMargin);
                         Canvas.SetLeft(m_SelectedElement, 30);
 
                         RebindKeys();

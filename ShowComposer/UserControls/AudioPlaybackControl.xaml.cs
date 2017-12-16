@@ -73,6 +73,7 @@ namespace ShowComposer.UserControls
 
         public bool IsPlaying { get { return (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing); } }
 
+        public string AudioTrackTitle { get { return string.Format("{0}", System.IO.Path.GetFileName(AudioFile)); } }
         public string AudioFile
         {
             get
@@ -811,11 +812,18 @@ namespace ShowComposer.UserControls
             }
         }
 
+        private void SeekToCurrentPosition()
+        {
+            audioFileReader.CurrentTime = TimeSpan.FromSeconds(audioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
+        }
+
         private void ButtonPlayCommand_Click(object sender, RoutedEventArgs e)
         {
             OnTryPlay?.Invoke(this, EventArgs.Empty);
 
             Play();
+
+            SeekToCurrentPosition();
 
             if (this.m_FadeInOutSampleProvider != null && !(audioFileReader is FlacReader))
             {
@@ -1038,6 +1046,7 @@ namespace ShowComposer.UserControls
             {
                 audioFileReader.CurrentTime = TimeSpan.FromSeconds(audioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
             }
+            ProgressBarPosition.Value = SliderSeek.Value;
         }
 
         private void SliderVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -1045,8 +1054,10 @@ namespace ShowComposer.UserControls
             if (InvokeSetVolumeDelegate != null)
             {
                 InvokeSetVolumeDelegate((float)SliderVolume.Value);
-                ProgressBarVolume.Value = SliderVolume.Value;
             }
+
+            if(ProgressBarVolume != null)
+                ProgressBarVolume.Value = SliderVolume.Value;
         }
 
         /// <summary>

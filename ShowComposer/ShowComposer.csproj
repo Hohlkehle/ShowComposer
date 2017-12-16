@@ -26,7 +26,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.2.13.%2a</ApplicationVersion>
+    <ApplicationVersion>1.3.13.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -462,6 +462,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\Programming-Console-icon.png" />
+    <Resource Include="Images\Media-vlc-icon.png" />
+    <Resource Include="Images\Media-winamp-icon.png" />
+    <Resource Include="Images\Media-wmp-icon.png" />
+    <Resource Include="Images\Whack-VLC-Player-icon.png" />
     <Content Include="ThirdParty\7za.exe" />
     <Content Include="ThirdParty\scfmm.exe" />
   </ItemGroup>

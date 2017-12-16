@@ -16,11 +16,12 @@ namespace ShowComposer.Windows
     public partial class VideoPlaybackWindow : Window
     {
         public static VideoPlaybackWindow instance;
+        private static int attemptsCount = 0;
         public event EventHandler OnVolumeValueChanged;
         private bool m_IsFullScreen;
         private double m_VolumeSens = 0.00025;
         private string m_VideoFile;
-        private bool IsCtrlDown;
+        private bool m_IsCtrlDown;
 
         public string VideoFile
         {
@@ -28,8 +29,8 @@ namespace ShowComposer.Windows
             set
             {
                 m_VideoFile = value;
-                mePlayer.Source = new Uri(m_VideoFile);
-                this.Title = string.Format("{0}", System.IO.Path.GetFileName(m_VideoFile));
+                mePlayer.Source = new Uri(m_VideoFile, UriKind.Absolute);
+                Title = string.Format("{0}", System.IO.Path.GetFileName(m_VideoFile));
                 lblFilename.Content = this.Title;
             }
         }
@@ -69,6 +70,12 @@ namespace ShowComposer.Windows
         {
             InitializeComponent();
 
+            MainWindow.OnApplicationQuit += (object sender, EventArgs e) =>
+            {
+                Stop();
+                Close();
+            };
+
             instance = this;
             mePlayer.MediaOpened += Player_MediaOpened;
             mePlayer.MediaEnded += Player_MediaEnded;
@@ -94,11 +101,12 @@ namespace ShowComposer.Windows
         #region Window Drag
         private bool m_IsDragInProgress;
         private System.Windows.Point m_FormMousePosition;
-        private bool sliderSeekdragStarted;
-        private DateTime sliderSeekMouseDownStart;
+        private bool m_SliderSeekdragStarted;
+        private DateTime m_SliderSeekMouseDownStart;
+
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Middle)
+            if (e.ChangedButton == MouseButton.Left)
             {
                 this.CaptureMouse();
                 this.m_IsDragInProgress = true;
@@ -138,7 +146,7 @@ namespace ShowComposer.Windows
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Middle)
+            if (e.ChangedButton == MouseButton.Left)
             {
                 this.m_IsDragInProgress = false;
                 this.ReleaseMouseCapture();
@@ -151,13 +159,17 @@ namespace ShowComposer.Windows
             mePlayer.Play();
         }
 
+        internal void Stop()
+        {
+            mePlayer.Stop();
+        }
         #endregion
 
         private void MainWindow_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
             {
-                IsCtrlDown = false;
+                m_IsCtrlDown = false;
             }
 
             if (e.Key == Key.Space)
@@ -193,7 +205,7 @@ namespace ShowComposer.Windows
 
                     ProgressBarProgress.Value = mePlayer.Position.TotalSeconds;
                 }
-            } else if (IsCtrlDown)
+            } else if (m_IsCtrlDown)
             {
 
             }
@@ -203,7 +215,7 @@ namespace ShowComposer.Windows
         {
             if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
             {
-                IsCtrlDown = true;
+                m_IsCtrlDown = true;
             }
 
             if (e.Key == Key.Escape)
@@ -213,29 +225,14 @@ namespace ShowComposer.Windows
             }
         }
 
-        void Player_MediaOpened(object sender, RoutedEventArgs e)
-        {
-            //SetAudioStreamIndex(0);
-            sliderPosition.Value = 0;
-            sliderPosition.Maximum = mePlayer.NaturalDuration.TimeSpan.TotalSeconds;
-            ProgressBarProgress.Value = sliderPosition.Value;
-            ProgressBarProgress.Maximum = sliderPosition.Maximum;
-        }
-
-        void Player_MediaEnded(object sender, RoutedEventArgs e)
-        {
-            ProgressBarProgress.Value = sliderPosition.Value = 0;
-            mePlayer.Stop();
-        }
-
-        void Timer_Tick(object sender, EventArgs e)
+        private void Timer_Tick(object sender, EventArgs e)
         {
             if (mePlayer.Source != null)
             {
                 if (mePlayer.NaturalDuration.HasTimeSpan)
                 {
                     lblStatus.Content = String.Format("{0} / {1}", mePlayer.Position.ToString(@"mm\:ss"), mePlayer.NaturalDuration.TimeSpan.ToString(@"mm\:ss"));
-                    if (!sliderSeekdragStarted)
+                    if (!m_SliderSeekdragStarted)
                         sliderPosition.Value = mePlayer.Position.TotalSeconds;
                     ProgressBarProgress.Value = sliderPosition.Value;
                 }
@@ -275,7 +272,7 @@ namespace ShowComposer.Windows
                     }
                     else
                     {
-                        MessageBox.Show("Error occurs, only video files allowed.");
+                        Core.CommandHelper.LogNotify("Error occurs, only video files allowed.");
                     }
                 }
             }
@@ -303,6 +300,7 @@ namespace ShowComposer.Windows
             MediaState state = (MediaState)stateField.GetValue(helperObject);
             return state;
         }
+
         private void SetAudioStreamIndex(int index)
         {
             FieldInfo hlp = typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -312,17 +310,17 @@ namespace ShowComposer.Windows
             //stateField.SetValue(mePlayer, index);
         }
 
-        private void btnPlay_Click(object sender, RoutedEventArgs e)
+        private void BtnPlay_Click(object sender, RoutedEventArgs e)
         {
             mePlayer.Play();
         }
 
-        private void btnPause_Click(object sender, RoutedEventArgs e)
+        private void BtnPause_Click(object sender, RoutedEventArgs e)
         {
             mePlayer.Pause();
         }
 
-        private void btnStop_Click(object sender, RoutedEventArgs e)
+        private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
             mePlayer.Stop();
         }
@@ -332,11 +330,61 @@ namespace ShowComposer.Windows
             IsFullScreen = !IsFullScreen;
         }
 
+        private void Player_MediaOpened(object sender, RoutedEventArgs e)
+        {
+            //SetAudioStreamIndex(0);
+            sliderPosition.Value = 0;
+            sliderPosition.Maximum = mePlayer.NaturalDuration.TimeSpan.TotalSeconds;
+            ProgressBarProgress.Value = sliderPosition.Value;
+            ProgressBarProgress.Maximum = sliderPosition.Maximum;
+        }
+
+        private void Player_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            ProgressBarProgress.Value = sliderPosition.Value = 0;
+            mePlayer.Stop();
+        }
+
         private void Player_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
             {
                 IsFullScreen = !IsFullScreen;
+            }
+        }
+
+        private void Player_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (mePlayer != null && e.MouseDevice.LeftButton == MouseButtonState.Pressed)
+            {
+                if (CurrentState == MediaState.Play)
+                    mePlayer.Pause();
+                else if (CurrentState == MediaState.Pause)
+                    mePlayer.Play();
+
+                e.Handled = true;
+            }
+
+        }
+
+        private void Player_MediaFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            if (!e.Handled && !string.IsNullOrEmpty(VideoFile) && attemptsCount < 2)
+            {
+                e.Handled = true;
+                attemptsCount++;
+                var wnd = new VideoPlaybackWindow();
+                wnd.Show();
+                if (ScreenHandler.AllScreens > 1)
+                {
+                    wnd.ShowOnMonitor(1);
+                }
+                wnd.WindowState = WindowState.Maximized;
+                wnd.VideoFile = VideoFile;
+                wnd.Volume = Volume;
+                wnd.Play();
+
+                Close();
             }
         }
 
@@ -365,14 +413,14 @@ namespace ShowComposer.Windows
                 //mePlayer.Play();
             }
 
-            sliderSeekdragStarted = false;
+            m_SliderSeekdragStarted = false;
         }
 
         private void SliderPosition_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             if (mePlayer == null) return;
 
-            if (DateTime.Now - sliderSeekMouseDownStart > TimeSpan.FromMilliseconds(300))
+            if (DateTime.Now - m_SliderSeekMouseDownStart > TimeSpan.FromMilliseconds(300))
                 SliderPosition_ThumbDragCompleted(null, null);
             else
             {
@@ -383,26 +431,26 @@ namespace ShowComposer.Windows
 
                 //mePlayer.Position = TimeSpan.FromSeconds(mePlayer.NaturalDuration.TimeSpan.TotalSeconds * sliderPosition.Value / 100.0);
 
-                sliderSeekdragStarted = false;
+                m_SliderSeekdragStarted = false;
             }
         }
 
         private void SliderPosition_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            sliderSeekMouseDownStart = DateTime.Now;
-            sliderSeekdragStarted = true;
+            m_SliderSeekMouseDownStart = DateTime.Now;
+            m_SliderSeekdragStarted = true;
         }
 
         private void SliderPosition_ThumbDragStarted(object sender, DragStartedEventArgs e)
         {
-            sliderSeekdragStarted = true;
+            m_SliderSeekdragStarted = true;
         }
 
         private void SliderPosition_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             // Приостановка воспроизведения перед переходом в другую позицию
             // исключит "заикания" при слишком быстрых движениях ползунка,
-            if (mePlayer != null && sliderSeekdragStarted)
+            if (mePlayer != null && m_SliderSeekdragStarted)
             {
                 mePlayer.Pause();
                 mePlayer.Position = TimeSpan.FromSeconds(sliderPosition.Value);
@@ -410,6 +458,17 @@ namespace ShowComposer.Windows
 
                 ProgressBarProgress.Value = sliderPosition.Value;
             }
+        }
+        
+        private void MenuItemOpenContainingFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if(System.IO.File.Exists(VideoFile))
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+            {
+                FileName = System.IO.Path.GetDirectoryName(VideoFile),
+                UseShellExecute = true,
+                Verb = "open"
+            });
         }
 
         /// <summary>
@@ -437,31 +496,6 @@ namespace ShowComposer.Windows
                 return 1f;
             }
             return value;
-        }
-
-        private void MenuItemOpenContainingFolder_Click(object sender, RoutedEventArgs e)
-        {
-            if(System.IO.File.Exists(VideoFile))
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
-            {
-                FileName = System.IO.Path.GetDirectoryName(VideoFile),
-                UseShellExecute = true,
-                Verb = "open"
-            });
-        }
-
-        private void Player_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            if (mePlayer != null && e.MouseDevice.LeftButton == MouseButtonState.Pressed)
-            {
-                if (CurrentState == MediaState.Play)
-                    mePlayer.Pause();
-                else if (CurrentState == MediaState.Pause)
-                    mePlayer.Play();
-
-                e.Handled = true;
-            }
-
         }
     }
 }

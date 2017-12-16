@@ -542,7 +542,7 @@
 
     </UserControl.Resources>
 
-    <Grid Margin="0,0,0,0" Height="27" VerticalAlignment="Top" HorizontalAlignment="Left" Width="30" DragEnter="myGrid_DragEnter" DragLeave="myGrid_DragLeave" Drop="myGrid_Drop">
+    <Grid Margin="0,0,0,0" Height="27" VerticalAlignment="Top" HorizontalAlignment="Left" Width="30" DragEnter="Grid_DragEnter" DragLeave="Grid_DragLeave" Drop="Grid_Drop">
         <Grid.ContextMenu>
             <ContextMenu>
                 <MenuItem Header="_Properties" x:Name="AudioPlaybackShowProperties" Click="AudioPlaybackShowProperties_Click"/>
@@ -553,7 +553,7 @@
         </Grid.ContextMenu>
 
         <Border x:Name="BorderContour" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" BorderThickness="2" Visibility="Hidden" Margin="0,4,-320,-34"/>
-        <Border x:Name="BorderBackground" BorderBrush="#E1141418" BorderThickness="1,1,1,1" Margin="8,15,-320,-24" Background="#C8303491" />
+        <Border x:Name="BorderBackground" BorderBrush="#E1141418" BorderThickness="1,1,1,1" Margin="8,15,-320,-24" Background="#C8303491" Cursor="SizeAll" />
 
 
         <Button Command="{Binding PlayCommand}" x:Name="ButtonPlayCommand" ToolTip="Play" Visibility="Visible" Click="ButtonPlayCommand_Click" Margin="0,4,-35,-34" Background="#E1141418" >
@@ -573,8 +573,8 @@
 
         <ProgressBar x:Name="ProgressBarVolume" Margin="226,37,-299,-16" Visibility="Visible" IsHitTestVisible="False" Value="0.5" Style="{StaticResource ProgressBarStyle}" Maximum="1" LargeChange="0.2"/>
 
-        <TextBlock x:Name="TextBlockTotalTime" HorizontalAlignment="Left" Margin="102,33,-169,-18" TextWrapping="Wrap" Text="03:00" VerticalAlignment="Top" Height="12" Width="97" FontFamily="Arial Rounded MT Bold" FontWeight="Bold" FontSize="11" Foreground="#FFBBBBBB" TextAlignment="Left"/>
-        <TextBlock x:Name="TextBlockTrackTitle" HorizontalAlignment="Left" Margin="97,17,-319,-4" Text="16. Marina ок The Diamonds - Primadonna" VerticalAlignment="Top" Height="14" Width="252" FontFamily="Microsoft Sans Serif" Foreground="#FFDFEAF5" FontWeight="Bold" FontSize="12.5" RenderTransformOrigin="0.5,0.5" >
+        <TextBlock x:Name="TextBlockTotalTime" HorizontalAlignment="Left" Margin="102,33,-169,-18" TextWrapping="Wrap" Text="03:00" VerticalAlignment="Top" Height="12" Width="97" FontFamily="Arial Rounded MT Bold" FontWeight="Bold" FontSize="11" Foreground="#FFBBBBBB" TextAlignment="Left" Cursor="SizeAll"/>
+        <TextBlock x:Name="TextBlockTrackTitle" HorizontalAlignment="Left" Margin="97,17,-319,-4" Text="16. Marina ок The Diamonds - Primadonna" VerticalAlignment="Top" Height="14" Width="252" FontFamily="Microsoft Sans Serif" Foreground="#FFDFEAF5" FontWeight="Bold" FontSize="12.5" RenderTransformOrigin="0.5,0.5" Cursor="SizeAll" >
 
         </TextBlock>
 

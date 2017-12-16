@@ -22,6 +22,11 @@ namespace ShowComposer.Windows
         public VolumeControlWindow()
         {
             InitializeComponent();
+
+            MainWindow.OnApplicationQuit += (object sender, EventArgs e) =>
+            {
+                Close();
+            };
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

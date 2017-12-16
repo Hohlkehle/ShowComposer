@@ -6,7 +6,7 @@
         xmlns:Gui="clr-namespace:ShowComposer.NAudioDemo.Gui"    
         xmlns:AudioPlaybackDemo="clr-namespace:ShowComposer.NAudioDemo.AudioPlaybackDemo"    
         x:Class="ShowComposer.MainWindow"
-        Title="Show Composer v1.1.0b" Height="720" Width="808" Closing="Window_Closing" Loaded="Window_Loaded" KeyUp="MainWindow_KeyUp" KeyDown="MainWindow_KeyDown" Icon="Images/very-basic-video-file-icon.png">
+        Title="Show Composer v1.1.0b" Height="720" Width="808" MaxWidth="808" Closing="Window_Closing" Loaded="Window_Loaded" KeyUp="MainWindow_KeyUp" KeyDown="MainWindow_KeyDown" Icon="Images/very-basic-video-file-icon.png" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
 
     <Grid Margin="0,0,0,0" >
         <Grid.RowDefinitions>
@@ -81,6 +81,26 @@
                             <Image Visibility="Visible" Source="Images/very-basic-video-file-icon.png" Width="16" Height="16"/>
                         </MenuItem.Icon>
                     </MenuItem>
+                    <MenuItem x:Name="MenuItemVLCVideotWindow" Visibility="Visible" Header="VLC Render Window" HorizontalAlignment="Left" Click="MenuItemVLCVideotWindow_Click" >
+                        <MenuItem.Icon>
+                            <Image Visibility="Visible" Source="Images/Whack-VLC-Player-icon.png" Width="16" Height="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="MenuItemVLCPlayer" Visibility="Visible" Header="Start VLC Player (V2.2.6)" HorizontalAlignment="Left" Click="MenuItemStartVLCPlayer_Click" >
+                        <MenuItem.Icon>
+                            <Image Visibility="Visible" Source="Images/Media-vlc-icon.png" Width="16" Height="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="MenuItemWMPlayer" Visibility="Visible" Header="Start Windows Media Player" HorizontalAlignment="Left" Click="MenuItemWMPlayer_Click" >
+                        <MenuItem.Icon>
+                            <Image Visibility="Visible" Source="Images/Media-wmp-icon.png" Width="16" Height="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="MenuItemWinampPlayer" Visibility="Visible" Header="Start Winamp" HorizontalAlignment="Left" Click="MenuItemWinampPlayer_Click" >
+                        <MenuItem.Icon>
+                            <Image Visibility="Visible" Source="Images/Media-winamp-icon.png" Width="16" Height="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem x:Name="MenuItemStudentsWindow" Header="Options" HorizontalAlignment="Left" Click="MenuItemOptionsWindow_Click" >
                         <MenuItem.Icon>
                             <Image Visibility="Visible" Source="Images/settings.png" Width="16" Height="16"/>
@@ -140,9 +160,39 @@
                         <Image Source="Images/very-basic-video-file-icon.png"/>
                     </Grid>
                 </Button>
+                <Button x:Name="ButtonVLCVideotWindow" ToolTip="VLC Render Window"  Margin="0,0,4,0" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="24" Height="24"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrush}}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="MenuItemVLCVideotWindow_Click">
+                    <Grid>
+                        <Image Source="Images/Whack-VLC-Player-icon.png"/>
+                    </Grid>
+                </Button>
+                <Button x:Name="ButtonWMPlayer" ToolTip="Start Windows Media Player"  Margin="0,0,4,0" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="24" Height="24"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrush}}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="MenuItemWMPlayer_Click">
+                    <Grid>
+                        <Image Source="Images/Media-wmp-icon.png"/>
+                    </Grid>
+                </Button>
+                <Button x:Name="ButtonWinampPlayer" ToolTip="Start Winamp"  Margin="0,0,4,0" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="24" Height="24"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrush}}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="MenuItemWinampPlayer_Click">
+                    <Grid>
+                        <Image Source="Images/Media-winamp-icon.png"/>
+                    </Grid>
+                </Button>
+                <Button x:Name="ButtonVLCPlayer" ToolTip="Start VLC Player (V2.2.6)"  Margin="0,0,4,0" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="24" Height="24"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrush}}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="MenuItemStartVLCPlayer_Click">
+                    <Grid>
+                        <Image Source="Images/Media-vlc-icon.png"/>
+                    </Grid>
+                </Button>
+                <Button ToolTip="" Background="DarkViolet" IsEnabled="False"  Margin="0,0,4,0" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="4" Height="24"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrush}}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                    <Grid>
+                        <Image Source="Images/spacer128x128.png"/>
+                    </Grid>
+                </Button>
                 <Button x:Name="ButtonSampleDeskWindow" ToolTip="Open sample desk window (Ctrl + D)"  Margin="0,0,4,0" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="24" Height="24"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrush}}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="MenuItemDeskWindow_Click">
                     <Grid>
                         <Image Source="Images/house-and-appliances-channel-mosaic-icon.png"/>
+                    </Grid>
+                </Button>
+                <Button x:Name="ButtonLoggingWindow" ToolTip="Open log window (Ctrl + J)"  Margin="0,0,4,0" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="24" Height="24"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrush}}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="MenuItemLoggingWindow_Click">
+                    <Grid>
+                        <Image Source="Images/Programming-Console-icon.png"/>
                     </Grid>
                 </Button>
                 <Button ToolTip="" Background="DarkViolet" IsEnabled="False"  Margin="0,0,4,0" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="4" Height="24"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrush}}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
@@ -155,6 +205,7 @@
                         <Image Source="Images/very-basic-volume-icon.png"/>
                     </Grid>
                 </Button>
+                
             </StackPanel>
             <Border BorderBrush="#FF3399FF" BorderThickness="0,0,0,1" Grid.Row="1" Margin="-10,0,-10,0" Grid.ColumnSpan="2"/>
         </Grid>

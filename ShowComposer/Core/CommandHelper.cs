@@ -21,19 +21,34 @@ namespace ShowComposer.Core
             if (!Properties.Settings.Default.LoggingEnabled)
                 return;
 
+            ShowLoggingWindow();
+
+            LoggingWindowInstance.Log(message);
+        }
+
+        public static void LogNotify(string message, string title = "Notification")
+        {
+            if (Properties.Settings.Default.LoggingEnabled)
+            {
+                ShowLoggingWindow();
+                LoggingWindowInstance.Log(message);
+            }
+
+            System.Windows.MessageBox.Show(message, title);
+        }
+
+        public static void ShowLoggingWindow()
+        {
             if (LoggingWindowInstance == null)
             {
                 LoggingWindowInstance = new LoggingWindow();
-                LoggingWindowInstance.Log(message);
                 LoggingWindowInstance.Show();
-
-            } else
+            }
+            else
             {
                 if (!LoggingWindowInstance.IsLoaded)
                     LoggingWindowInstance = new LoggingWindow();
 
-                LoggingWindowInstance.Log(message);
-                
                 LoggingWindowInstance.Show();
             }
         }
@@ -58,5 +73,16 @@ namespace ShowComposer.Core
             return presentExtensions.Contains(System.IO.Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
         }
 
+        public static int IndexOf<T>(IEnumerable<T> source, T value)
+        {
+            int index = 0;
+            var comparer = EqualityComparer<T>.Default; // or pass in as a parameter
+            foreach (T item in source)
+            {
+                if (comparer.Equals(item, value)) return index;
+                index++;
+            }
+            return -1;
+        }
     }
 }

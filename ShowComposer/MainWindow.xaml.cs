@@ -30,9 +30,11 @@ namespace ShowComposer
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
+        //const int WINDOW_WIDTH = 808;
         public static IniFile iniFile;
 
         public static event EventHandler<LayoutEditorSelectionEventArgs> OnUIElementSelected = (Object sender, LayoutEditorSelectionEventArgs e) => { };
+        public static event EventHandler<EventArgs> OnApplicationQuit = (object sender, EventArgs e) => { };
 
         private string m_IniPath = System.IO.Path.Combine(Environment.CurrentDirectory, "settings.ini");
         private bool m_IsSelected = false;
@@ -149,7 +151,7 @@ namespace ShowComposer
                 }
                 catch (Exception waveFormException)
                 {
-                    MessageBox.Show(String.Format("waveFormException {0}", waveFormException.Message), "Error Initializing Output");
+                    Core.CommandHelper.LogNotify(String.Format("waveFormException {0}", waveFormException.Message), "Error Initializing Output");
                     return;
                 }
             };
@@ -172,16 +174,12 @@ namespace ShowComposer
                 plr.Stop();
             }
 
-            if (m_SampleDeskWindow != null)
-                m_SampleDeskWindow.Close();
-
-            if (VideoPlaybackWindow.instance != null)
-                VideoPlaybackWindow.instance.Close();
-
-
-            m_VolumeControlWindow?.Close();
-            LoggingWindow.Quit();
             SavePreferences();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            OnApplicationQuit(this, e);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -194,6 +192,14 @@ namespace ShowComposer
             //myScrollViewer.ScrollToVerticalOffset(e.VerticalOffset);
             //FindVisualChild<ScrollViewer>(documentviewWord).ScrollToVerticalOffset(e.VerticalOffset);
             FindVisualChild<ScrollViewer>(flowDocumentReader).ScrollToVerticalOffset(e.VerticalOffset);
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (e.WidthChanged)
+            {
+                //Width = WINDOW_WIDTH;
+            }
         }
 
         private void MainWindow_KeyUp(object sender, KeyEventArgs e)
@@ -379,6 +385,44 @@ namespace ShowComposer
                 m_VolumeControlWindow.Show();
                 m_VolumeControlWindow.Focus();
             }
+        }
+
+        private void MenuItemLoggingWindow_Click(object sender, RoutedEventArgs e)
+        {
+            Core.CommandHelper.ShowLoggingWindow();
+        }
+
+        private void MenuItemVLCVideotWindow_Click(object sender, RoutedEventArgs e)
+        {
+            var m_VideoPlaybackWindow = new VLCVideoPlaybackWindow();
+            m_VideoPlaybackWindow.Show();
+        }
+
+        private void MenuItemStartVLCPlayer_Click(object sender, RoutedEventArgs e)
+        {
+            string output;
+            var vlc = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vlc-" + Properties.Settings.Default.VLCVersion, "vlc.exe");
+            if (System.IO.File.Exists(vlc))
+                FileExecutionHelper.ExecutionHelper.RunCmdCommand(
+                           "\"" + vlc + "\" ", out output, false, 1251);
+        }
+
+        private void MenuItemWMPlayer_Click(object sender, RoutedEventArgs e)
+        {
+            string output;
+            string player = System.IO.Path.Combine(System.IO.Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), Properties.Settings.Default.WMPSystemPath);
+
+            FileExecutionHelper.ExecutionHelper.RunCmdCommand(
+                   "\"" + player + "\" ", out output, false, 1251);
+        }
+
+        private void MenuItemWinampPlayer_Click(object sender, RoutedEventArgs e)
+        {
+            string output;
+            string player = iniFile.GetString("Externals", "AudioPlayer", "C:\\Program Files (x86)\\AIMP2\\AIMP2.exe");
+
+            FileExecutionHelper.ExecutionHelper.RunCmdCommand(
+                "\"" + player + "\" ", out output, false, 1251);
         }
 
         private void ButtonOpenScenario_Click(object sender, RoutedEventArgs e)
@@ -637,7 +681,7 @@ namespace ShowComposer
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка сохранения настроек. " + ex.Message, "Ошибка");
+                Core.CommandHelper.LogNotify("Ошибка сохранения настроек. " + ex.Message);
             }
         }
         
@@ -672,7 +716,7 @@ namespace ShowComposer
 
                 if (!di.Exists)
                 {
-                    MessageBox.Show("Error occurs. Can't create directory " + mediaFolder, "Ошибка");
+                    Core.CommandHelper.LogNotify("Error occurs. Can't create directory " + mediaFolder);
                     return;
                 }
 
@@ -1057,6 +1101,10 @@ namespace ShowComposer
 
             return eventDelegate;
         }
+
+
         #endregion
+
+      
     }
 }

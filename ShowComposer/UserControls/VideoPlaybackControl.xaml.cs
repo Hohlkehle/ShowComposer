@@ -18,7 +18,7 @@ namespace ShowComposer.UserControls
         public static event EventHandler OnPlay;
         public event EventHandler OnRemove;
 
-        private DispatcherTimer dispatcherTimer;
+        private DispatcherTimer m_DispatcherTimer;
 
         //private bool sliderSeekdragStarted;
         //private DateTime sliderSeekMouseDownStart;
@@ -61,9 +61,9 @@ namespace ShowComposer.UserControls
 
             InitializeComponent();
 
-            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
+            m_DispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            m_DispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
+            m_DispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
 
             MainWindow.OnUIElementSelected += MainWindow_OnUIElementSelected;
         }
@@ -92,14 +92,12 @@ namespace ShowComposer.UserControls
                 BorderContour.Visibility = System.Windows.Visibility.Hidden;
         }
 
-        void MainWindow_OnUIElementSelected(object sender, LayoutEditorSelectionEventArgs e)
+        private void MainWindow_OnUIElementSelected(object sender, LayoutEditorSelectionEventArgs e)
         {
             if (this.Equals(e.UIElement) || (e.UIElement == null && !e.IsSelected))
                 BorderContour.Visibility = e.IsSelected ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
         }
-
-
-
+        
         #region Playback
         public void Play()
         {
@@ -157,8 +155,10 @@ namespace ShowComposer.UserControls
             {
                 wnd.ShowOnMonitor(1);
             }
+            wnd.WindowState = WindowState.Maximized;
             wnd.VideoFile = VideoFile;
-            wnd.Volume = SoundVolume * 100;
+            wnd.Volume = SoundVolume * 1;
+
             wnd.Play();
         }
 
@@ -191,14 +191,14 @@ namespace ShowComposer.UserControls
                 m_VideoPlaybackWindow.WindowState = WindowState.Maximized;
                 m_VideoPlaybackWindow.Play();
 
-                m_VideoPlaybackWindow.Closing += m_VideoPlaybackWindow_Closing;
-                m_VideoPlaybackWindow.OnVolumeValueChanged += m_VideoPlaybackWindow_OnVolumeValueChanged;
-                m_VideoPlaybackWindow.MediaEnded += mePlayer_MediaEnded;
-                dispatcherTimer.Start();
+                m_VideoPlaybackWindow.Closing += VideoPlaybackWindow_Closing;
+                m_VideoPlaybackWindow.OnVolumeValueChanged += VideoPlaybackWindow_OnVolumeValueChanged;
+                m_VideoPlaybackWindow.MediaEnded += Player_MediaEnded;
+                m_DispatcherTimer.Start();
             }
             catch (Exception initException)
             {
-                MessageBox.Show(String.Format("initException {0}", initException.Message), "Error Initializing Video Output");
+                Core.CommandHelper.LogNotify(String.Format("initException {0}", initException.Message), "Error Initializing Video Output");
                 return;
             }
         }
@@ -246,7 +246,7 @@ namespace ShowComposer.UserControls
             return;
         }
 
-        void mePlayer_MediaEnded(object sender, RoutedEventArgs e)
+        private void Player_MediaEnded(object sender, RoutedEventArgs e)
         {
             Dispatcher.Invoke(delegate
             {
@@ -254,22 +254,21 @@ namespace ShowComposer.UserControls
                 ButtonPlayCommand.Visibility = System.Windows.Visibility.Visible;
             });
 
-            dispatcherTimer.Stop();
+            m_DispatcherTimer.Stop();
         }
 
-        void m_VideoPlaybackWindow_OnVolumeValueChanged(object sender, EventArgs e)
+        private void VideoPlaybackWindow_OnVolumeValueChanged(object sender, EventArgs e)
         {
             SliderVolume.Value = m_VideoPlaybackWindow.Volume;
             ProgressBarVolume.Value = SliderVolume.Value;
         }
 
-        void m_VideoPlaybackWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void VideoPlaybackWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             ButtonStopCommand_Click(null, null);
         }
-
-
-        void LoadTrackTags()
+        
+        private void LoadTrackTags()
         {
             if (String.IsNullOrEmpty(VideoFile) || !System.IO.File.Exists(VideoFile))
                 return;
@@ -338,7 +337,7 @@ namespace ShowComposer.UserControls
             ButtonPlayCommand.Visibility = System.Windows.Visibility.Visible;
 
 
-            dispatcherTimer.Stop();
+            m_DispatcherTimer.Stop();
         }
 
         private void OnOpenFileClick(object sender, EventArgs e)
@@ -353,7 +352,7 @@ namespace ShowComposer.UserControls
             }
         }
 
-        private void myGrid_DragEnter(object sender, DragEventArgs e)
+        private void Grid_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 e.Effects = DragDropEffects.Copy; // Okay
@@ -361,10 +360,10 @@ namespace ShowComposer.UserControls
                 e.Effects = DragDropEffects.None; // Unknown data, ignore it
         }
 
-        private void myGrid_DragLeave(object sender, DragEventArgs e)
+        private void Grid_DragLeave(object sender, DragEventArgs e)
         { }
 
-        private void myGrid_Drop(object sender, DragEventArgs e)
+        private void Grid_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -428,10 +427,7 @@ namespace ShowComposer.UserControls
         {
             return c1 + ((x - a1) / (a2 - a1)) * (c2 - c1) / 1.0f;
         }
-
-
-
-
+        
         ~VideoPlaybackControl()
         {
             MainWindow.OnUIElementSelected -= MainWindow_OnUIElementSelected;
@@ -446,9 +442,7 @@ namespace ShowComposer.UserControls
         {
 
         }
-
-
-
+        
         public double SoundVolume { get { return SliderVolume.Value; } set { SliderVolume.Value = value; ProgressBarVolume.Value = value; } }
 
         private void ButtonCloseCommand_Click(object sender, RoutedEventArgs e)
@@ -459,7 +453,6 @@ namespace ShowComposer.UserControls
                 OnRemove(this, e);
             }
         }
-
 
         private void AudioPlaybackExclusive_Checked(object sender, RoutedEventArgs e)
         {

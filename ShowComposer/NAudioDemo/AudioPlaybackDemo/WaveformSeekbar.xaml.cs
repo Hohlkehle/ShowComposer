@@ -394,8 +394,9 @@ namespace ShowComposer.NAudioDemo.AudioPlaybackDemo
         {
             var pos = e.GetPosition((UIElement)sender);
 
-            AudioPlaybackControl.AudioFileReader.CurrentTime = TimeSpan.FromSeconds(
-                AudioPlaybackControl.AudioFileReader.TotalTime.TotalSeconds * pos.X / ActualWidth);
+            if(AudioPlaybackControl != null)
+                AudioPlaybackControl.AudioFileReader.CurrentTime = TimeSpan.FromSeconds(
+                    AudioPlaybackControl.AudioFileReader.TotalTime.TotalSeconds * pos.X / ActualWidth);
 
             mouseDown = false;
         }

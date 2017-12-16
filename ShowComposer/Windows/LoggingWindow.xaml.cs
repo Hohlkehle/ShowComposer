@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShowComposer.UserControls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +25,27 @@ namespace ShowComposer.Windows
         {
             instance = this;
             InitializeComponent();
+            Initialize();
             Log("\n---------------------------------------");
+        }
+
+        private void Initialize()
+        {
+            MainWindow.OnApplicationQuit += (object sender, EventArgs e) =>
+            {
+                Quit();
+            };
+
+            AudioPlaybackControl.OnPlay += (object sender, EventArgs e) =>
+            {
+                AudioPlaybackControl apc = (AudioPlaybackControl)sender;
+                Log("Now playing {0}", apc.AudioTrackTitle);
+            };
+            AudioPlaybackControl.OnStop += (object sender, EventArgs e) =>
+            {
+                AudioPlaybackControl apc = (AudioPlaybackControl)sender;
+                Log("{0} STOPPED", apc.AudioTrackTitle);
+            };
         }
 
         public static void LogStatic(string message)
@@ -42,6 +63,14 @@ namespace ShowComposer.Windows
         {
             Dispatcher.Invoke(delegate {
                 RichTextBox1.AppendText(message);
+                RichTextBox1.AppendText("\n");
+            });
+        }
+
+        public void Log(string format, params string[] message)
+        {
+            Dispatcher.Invoke(delegate {
+                RichTextBox1.AppendText(string.Format(format, message));
                 RichTextBox1.AppendText("\n");
             });
         }

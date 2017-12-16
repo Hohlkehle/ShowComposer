@@ -32,6 +32,11 @@ namespace ShowComposer.Windows
         {
             InitializeComponent();
 
+            MainWindow.OnApplicationQuit += (object sender, EventArgs e) =>
+            {
+                Close();
+            };
+
             MyDeskLayoutGrid.DeskLayout = MyDeskLayout;
         }
 

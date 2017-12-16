@@ -43,7 +43,7 @@ namespace ShowComposer.Windows
         private long m_LastClickTime;
         private int m_DoubleClickSensetivity = 2200000;
 
-        private UserActivityHook m_ActHook;
+        //private UserActivityHook m_ActHook;
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         private static extern IntPtr GetForegroundWindow();
@@ -60,7 +60,7 @@ namespace ShowComposer.Windows
             get
             {
                 //return MyControl.MediaPlayer.Audio != null  && MyControl.MediaPlayer.Audio.Volume != -1 ? MyControl.MediaPlayer.Audio.Volume : m_Volume; 
-                return m_Volume; 
+                return m_Volume;
             }
         }
 
@@ -101,6 +101,12 @@ namespace ShowComposer.Windows
         {
             InitializeComponent();
 
+            MainWindow.OnApplicationQuit += (object sender, EventArgs e) =>
+            {
+                Stop();
+                Close();
+            };
+
             //var mediaPlayer = new Vlc.DotNet.Core.VlcMediaPlayer(new DirectoryInfo(libDirectory));
             MyControl.MediaPlayer.VlcLibDirectoryNeeded += OnVlcControlNeedsLibDirectory;
             MyControl.MediaPlayer.VlcMediaplayerOptions = new string[] { "-f", "--dummy-quiet", "--ignore-config", "--no-video-title", "--no-sub-autodetect-file" };
@@ -122,7 +128,8 @@ namespace ShowComposer.Windows
             {
                 //MyControl.MediaPlayer.Audio.Volume = (int)Volume;
                 var vlc = ((Vlc.DotNet.Forms.VlcControl)sender);
-                Dispatcher.Invoke(delegate {
+                Dispatcher.Invoke(delegate
+                {
                     sliderPosition.Maximum = vlc.Length;
                     ProgressBarProgress.Maximum = vlc.Length;
                     sliderPosition.Value = vlc.Time;
@@ -132,11 +139,11 @@ namespace ShowComposer.Windows
                 });
             };
 
-            // crate an instance with global hooks hang on events
-            m_ActHook = new UserActivityHook();
-            m_ActHook.OnMouseActivity += ActHook_OnMouseActivity;
-            m_ActHook.Start();
-            
+            //// crate an instance with global hooks hang on events
+            //m_ActHook = new UserActivityHook();
+            //m_ActHook.OnMouseActivity += ActHook_OnMouseActivity;
+            //m_ActHook.Start();
+
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += Timer_Tick;
@@ -328,7 +335,7 @@ namespace ShowComposer.Windows
         private System.Windows.Point m_FormMousePosition;
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Right)
+            if (e.ChangedButton == MouseButton.Left)
             {
                 CaptureMouse();
                 m_IsDragInProgress = true;
@@ -365,7 +372,7 @@ namespace ShowComposer.Windows
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Right)
+            if (e.ChangedButton == MouseButton.Left)
             {
                 this.m_IsDragInProgress = false;
                 this.ReleaseMouseCapture();
@@ -406,9 +413,10 @@ namespace ShowComposer.Windows
                         step = new TimeSpan(0, 0, 15);
                     }
 
-                   // MyControl.MediaPlayer.Pause();
+                    // MyControl.MediaPlayer.Pause();
 
-                    if (e.Key == Key.Right) {
+                    if (e.Key == Key.Right)
+                    {
                         var nt = MyControl.MediaPlayer.Time += (long)step.TotalMilliseconds;
                         if (nt >= MyControl.MediaPlayer.Length)
                             Stop();
@@ -537,7 +545,7 @@ namespace ShowComposer.Windows
         {
             if (MyControl.MediaPlayer != null)
             {
-                MyControl.MediaPlayer.Time = (long)( MyControl.MediaPlayer.Time * sliderPosition.Value / 100.0);
+                MyControl.MediaPlayer.Time = (long)(MyControl.MediaPlayer.Time * sliderPosition.Value / 100.0);
             }
 
             m_SliderSeekdragStarted = false;
@@ -580,7 +588,7 @@ namespace ShowComposer.Windows
                 //ProgressBarProgress.Value = sliderPosition.Value;
             }
         }
-        
+
         private void VideoPlaybackFullScreen_Click(object sender, RoutedEventArgs e)
         {
             IsFullScreen = !IsFullScreen;
@@ -604,17 +612,17 @@ namespace ShowComposer.Windows
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (m_ActHook != null)
-                m_ActHook.Stop();
+            //if (m_ActHook != null)
+            //    m_ActHook.Stop();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if(WindowState == WindowState.Maximized)
+            if (WindowState == WindowState.Maximized)
             {
-                MyControl.Margin = new Thickness(0,0,0,0);
+                MyControl.Margin = new Thickness(0, 0, 0, 0);
             }
-            else if(WindowState == WindowState.Normal)
+            else if (WindowState == WindowState.Normal)
             {
                 MyControl.Margin = new Thickness(0, 0, 0, 30);
             }
