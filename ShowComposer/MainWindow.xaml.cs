@@ -101,7 +101,9 @@ namespace ShowComposer
         public MainWindow()
         {
             InitializeComponent();
-
+            Initialize();
+            
+            
             IniFileInit();
             LoadPreferences();
 
@@ -165,6 +167,12 @@ namespace ShowComposer
             //    // ((Image)(myScrollViewer.Content)).Height = FindVisualChild<ScrollViewer>(screenplayRack.documentviewWord).ExtentHeight;
             //}));
 
+        }
+
+        private void Initialize()
+        {
+            var asName = typeof(MainWindow).Assembly.GetName();
+            Title = String.Format("{0} v{1}b", asName.Name, asName.Version);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -356,7 +364,7 @@ namespace ShowComposer
         {
             var wnd = new OptionsWindow(new List<IOutputDevicePlugin>() {
                 new WasapiOutPlugin(),
-                new WaveOutPlugin(),
+                new WaveOutPlugin(),      
                 new DirectSoundOutPlugin(),
                 new NullOutPlugin()
             });
@@ -491,10 +499,7 @@ namespace ShowComposer
             else if (!BusyIndicatorSheetLoading.IsBusy)
                 BusyIndicatorSheetLoading.IsBusy = true;
         }
-
-
-       
-
+        
         private void ReadDocx(string path)
         {
             if (!File.Exists(path))
@@ -508,8 +513,6 @@ namespace ShowComposer
                     this.Title = System.IO.Path.GetFileName(path);
                 }
         }
-
-       
         
         private void LoadProjectFileAsync(string p)
         {
@@ -574,6 +577,7 @@ namespace ShowComposer
         {
             return !(System.Windows.Application.Current is App);
         }
+
         private childItem FindVisualChild<childItem>(DependencyObject obj) where childItem : DependencyObject
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
@@ -643,15 +647,9 @@ namespace ShowComposer
             // error occured, return false
             return false;
         }
-
-  
-
-
+        
         #endregion
-
-
-
-
+        
         private void IniFileInit()
         {
             if (!File.Exists(m_IniPath))
@@ -685,8 +683,6 @@ namespace ShowComposer
             }
         }
         
-        
-
         private void ConsolidateProject()
         {
             using (new WaitCursor())
@@ -863,7 +859,8 @@ namespace ShowComposer
             ////myScrollViewer.SetCurrentValue(ScrollViewer.ViewportHeightProperty, ViewportHeight);
             ////((Image)(myScrollViewer.Content)).Height = ViewportHeight;
         }
-        private void btnSelectWord_Click(object sender, RoutedEventArgs e)
+
+        private void SelectWord_Click(object sender, RoutedEventArgs e)
         {
             // Initialize an OpenFileDialog
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -1101,10 +1098,6 @@ namespace ShowComposer
 
             return eventDelegate;
         }
-
-
         #endregion
-
-      
     }
 }

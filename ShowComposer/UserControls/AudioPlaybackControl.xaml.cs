@@ -25,28 +25,28 @@ namespace ShowComposer.UserControls
     {
         public static event EventHandler OnTryPlay, OnPlay, OnStop;
         public event EventHandler OnRemove;
-        private IWavePlayer waveOut;
+        private IWavePlayer m_WaveOut;
         private string m_AudioFile = null;
-        private WaveStream audioFileReader;
+        private WaveStream m_AudioFileReader;
         private Action<float> InvokeSetVolumeDelegate;
-        private BackgroundWorker WorkerThread = new BackgroundWorker();
-        private DispatcherTimer dispatcherTimer;
-        private IOutputDevicePlugin SelectedOutputDevicePlugin;
-        private bool sliderSeekdragStarted;
-        private DateTime sliderSeekMouseDownStart;
+        private BackgroundWorker m_orkerThread = new BackgroundWorker();
+        private DispatcherTimer m_DispatcherTimer;
+        private IOutputDevicePlugin m_SelectedOutputDevicePlugin;
+        private bool m_SliderSeekdragStarted;
+        private DateTime m_SliderSeekMouseDownStart;
         private bool m_IsExclusivePlayback = false;
         private bool m_IsRelativePath;
 
         public IWavePlayer WaveOutPlayer
         {
-            get { return waveOut; }
-            set { waveOut = value; }
+            get { return m_WaveOut; }
+            set { m_WaveOut = value; }
         }
 
         public WaveStream AudioFileReader
         {
-            get { return audioFileReader; }
-            set { audioFileReader = value; }
+            get { return m_AudioFileReader; }
+            set { m_AudioFileReader = value; }
         }
 
         public bool IsRelativePath
@@ -71,7 +71,7 @@ namespace ShowComposer.UserControls
 
         public ICommand StopCommand { get; private set; }
 
-        public bool IsPlaying { get { return (waveOut != null && waveOut.PlaybackState == PlaybackState.Playing); } }
+        public bool IsPlaying { get { return (m_WaveOut != null && m_WaveOut.PlaybackState == PlaybackState.Playing); } }
 
         public string AudioTrackTitle { get { return string.Format("{0}", System.IO.Path.GetFileName(AudioFile)); } }
         public string AudioFile
@@ -96,7 +96,7 @@ namespace ShowComposer.UserControls
             OnPlay += (object sender, EventArgs e) =>
             {
                 var apcItem = (AudioPlaybackControl)sender;
-                if (!IsExclusivePlayback && !apcItem.IsExclusivePlayback && apcItem != this && waveOut != null && waveOut.PlaybackState == PlaybackState.Playing)
+                if (!IsExclusivePlayback && !apcItem.IsExclusivePlayback && apcItem != this && m_WaveOut != null && m_WaveOut.PlaybackState == PlaybackState.Playing)
                 {
                     ButtonStopCommand_Click(null, null);
                 }
@@ -138,27 +138,27 @@ namespace ShowComposer.UserControls
             //PlayCommand = new DelegateCommand(Play);
             //StopCommand = new DelegateCommand(Stop);
 
-            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
+            m_DispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            m_DispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
+            m_DispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
 
             MainWindow.OnUIElementSelected += MainWindow_OnUIElementSelected;
         }
 
         private void DispatcherTimer_Tick(object sender, EventArgs e)
         {
-            if (waveOut != null && audioFileReader != null)
+            if (m_WaveOut != null && m_AudioFileReader != null)
             {
-                TimeSpan currentTime = (waveOut.PlaybackState == PlaybackState.Stopped) ? TimeSpan.Zero : audioFileReader.CurrentTime;
+                TimeSpan currentTime = (m_WaveOut.PlaybackState == PlaybackState.Stopped) ? TimeSpan.Zero : m_AudioFileReader.CurrentTime;
 
-                if (!sliderSeekdragStarted)
-                    SliderSeek.Value = Math.Min(SliderSeek.Maximum, (int)(100 * currentTime.TotalSeconds / audioFileReader.TotalTime.TotalSeconds));
+                if (!m_SliderSeekdragStarted)
+                    SliderSeek.Value = Math.Min(SliderSeek.Maximum, (int)(100 * currentTime.TotalSeconds / m_AudioFileReader.TotalTime.TotalSeconds));
                 ProgressBarPosition.Value = SliderSeek.Value;
 
                 TextBlockPlayedTime.Text = String.Format("{0:00}:{1:00}", (int)currentTime.TotalMinutes, currentTime.Seconds);
-                TextBlockTotalTime.Text = String.Format("{0:00}:{1:00}", (int)audioFileReader.TotalTime.TotalMinutes, audioFileReader.TotalTime.Seconds);
+                TextBlockTotalTime.Text = String.Format("{0:00}:{1:00}", (int)m_AudioFileReader.TotalTime.TotalMinutes, m_AudioFileReader.TotalTime.Seconds);
 
-                if (waveOut.PlaybackState == PlaybackState.Stopped)
+                if (m_WaveOut.PlaybackState == PlaybackState.Stopped)
                 {
 
                 }
@@ -201,11 +201,11 @@ namespace ShowComposer.UserControls
         {
             try
             {
-                WorkerThread.WorkerReportsProgress = true;
-                WorkerThread.DoWork += new DoWorkEventHandler(WorkerThread_DoWork);
-                WorkerThread.ProgressChanged += new ProgressChangedEventHandler(WorkerThread_ProgressChanged);
-                WorkerThread.RunWorkerCompleted += new RunWorkerCompletedEventHandler(WorkerThread_RunWorkerCompleted);
-                WorkerThread.RunWorkerAsync();
+                m_orkerThread.WorkerReportsProgress = true;
+                m_orkerThread.DoWork += new DoWorkEventHandler(WorkerThread_DoWork);
+                m_orkerThread.ProgressChanged += new ProgressChangedEventHandler(WorkerThread_ProgressChanged);
+                m_orkerThread.RunWorkerCompleted += new RunWorkerCompletedEventHandler(WorkerThread_RunWorkerCompleted);
+                m_orkerThread.RunWorkerAsync();
             }
             catch (Exception ex)
             {
@@ -244,7 +244,7 @@ namespace ShowComposer.UserControls
                 for (var i = 0; i < 100; i++)
                 {
                     Thread.Sleep(300);
-                    WorkerThread.ReportProgress(i);
+                    m_orkerThread.ReportProgress(i);
                 }
             }
             catch (Exception ex)
@@ -279,12 +279,12 @@ namespace ShowComposer.UserControls
                     if (Preferences.WaveOutCallback == "Event")
                         strategy = WaveCallbackStrategy.Event;
 
-                    SelectedOutputDevicePlugin = new WaveOutPlugin(strategy, Preferences.WaveOutDevice);
+                    m_SelectedOutputDevicePlugin = new WaveOutPlugin(strategy, Preferences.WaveOutDevice);
 
                     break;
                 case "WasapiOut":
                     var endPoints = new MMDeviceEnumerator().EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-                    SelectedOutputDevicePlugin = new WasapiOutPlugin(
+                    m_SelectedOutputDevicePlugin = new WasapiOutPlugin(
                         endPoints[Preferences.WasapiOutDevice],
                         Preferences.WasapiOutExclusiveMode == "True" ? AudioClientShareMode.Exclusive : AudioClientShareMode.Shared,
                         Preferences.WasapiOutIsEventCallback == "True",
@@ -306,30 +306,30 @@ namespace ShowComposer.UserControls
                     //break;
                 case "DirectSound":
                 default:
-                    SelectedOutputDevicePlugin = new DirectSoundOutPlugin();
+                    m_SelectedOutputDevicePlugin = new DirectSoundOutPlugin();
                     break;
             }
 
 
 
 
-            if (!SelectedOutputDevicePlugin.IsAvailable)
+            if (!m_SelectedOutputDevicePlugin.IsAvailable)
             {
                 MessageBox.Show("The selected output driver is not available on this system");
                 return;
             }
 
-            if (waveOut != null)
+            if (m_WaveOut != null)
             {
-                if (waveOut.PlaybackState == PlaybackState.Playing)
+                if (m_WaveOut.PlaybackState == PlaybackState.Playing)
                 {
                     return;
                 }
-                else if (waveOut.PlaybackState == PlaybackState.Paused)
+                else if (m_WaveOut.PlaybackState == PlaybackState.Paused)
                 {
                     System.Threading.Tasks.Task.Factory.StartNew(new Action(() =>
                     {
-                        waveOut.Play();
+                        m_WaveOut.Play();
                     }));
 
                     return;
@@ -341,7 +341,7 @@ namespace ShowComposer.UserControls
             {
                 CreateWaveOut();
 
-                dispatcherTimer.Start();
+                m_DispatcherTimer.Start();
 
                 Dispatcher.Invoke(delegate { LoadTrackTags(); });
 
@@ -372,7 +372,7 @@ namespace ShowComposer.UserControls
                 //if (m_FadeInOutSampleProvider != null && !(audioFileReader is FlacReader))
                 //    waveOut.Init(m_FadeInOutSampleProvider);
                 //else
-                waveOut.Init(sampleProvider);
+                m_WaveOut.Init(sampleProvider);
             }
             catch (Exception initException)
             {
@@ -384,7 +384,7 @@ namespace ShowComposer.UserControls
             Dispatcher.Invoke(delegate { InvokeSetVolumeDelegate((float)SliderVolume.Value); });
             System.Threading.Tasks.Task.Factory.StartNew(new Action(() =>
             {
-                waveOut.Play();
+                m_WaveOut.Play();
             }));
 
             //try
@@ -427,9 +427,9 @@ namespace ShowComposer.UserControls
 
         public bool Stop()
         {
-            if (waveOut != null)
+            if (m_WaveOut != null)
             {
-                waveOut.Stop();
+                m_WaveOut.Stop();
             }
 
             OnStop?.Invoke(this, EventArgs.Empty);
@@ -457,40 +457,40 @@ namespace ShowComposer.UserControls
         {
             if (System.IO.Path.GetExtension(fileName).ToUpper() == ".FLAC")
             {
-                this.audioFileReader = new FlacReader(fileName);
+                this.m_AudioFileReader = new FlacReader(fileName);
             }
             else
-                this.audioFileReader = new AudioFileReader(fileName);
+                this.m_AudioFileReader = new AudioFileReader(fileName);
 
-            if (!(audioFileReader is FlacReader))
+            if (!(m_AudioFileReader is FlacReader))
             {
-                m_FadeInOutSampleProvider = new FadeInOutSampleProvider((ISampleProvider)audioFileReader, false);
+                FadeInOutSampleProvider = new FadeInOutSampleProvider((ISampleProvider)m_AudioFileReader, false);
 
             }
 
-            var sampleChannel = new SampleChannel(audioFileReader, true);
+            var sampleChannel = new SampleChannel(m_AudioFileReader, true);
             sampleChannel.PreVolumeMeter += OnPreVolumeMeter;
             this.InvokeSetVolumeDelegate = (vol) =>
             {
                 sampleChannel.Volume = vol;
-                if (audioFileReader is AudioFileReader)
-                    ((AudioFileReader)audioFileReader).Volume = vol;
+                if (m_AudioFileReader is AudioFileReader)
+                    ((AudioFileReader)m_AudioFileReader).Volume = vol;
 
             };
-            var postVolumeMeter = new MeteringSampleProvider(((audioFileReader is FlacReader)) ? sampleChannel : (ISampleProvider)m_FadeInOutSampleProvider);
+            var postVolumeMeter = new MeteringSampleProvider(((m_AudioFileReader is FlacReader)) ? sampleChannel : (ISampleProvider)FadeInOutSampleProvider);
             postVolumeMeter.StreamVolume += OnPostVolumeMeter;
 
             return postVolumeMeter;
         }
 
-        void OnPreVolumeMeter(object sender, StreamVolumeEventArgs e)
+        private void OnPreVolumeMeter(object sender, StreamVolumeEventArgs e)
         {
             // we know it is stereo
             //waveformPainter1.AddMax(e.MaxSampleValues[0]);
             // waveformPainter2.AddMax(e.MaxSampleValues[1]);
         }
 
-        void OnPostVolumeMeter(object sender, StreamVolumeEventArgs e)
+        private void OnPostVolumeMeter(object sender, StreamVolumeEventArgs e)
         {
             // we know it is stereo
             System.Threading.Tasks.Task.Factory.StartNew(new Action(() =>
@@ -763,58 +763,58 @@ namespace ShowComposer.UserControls
         {
             CloseWaveOut();
             var latency = Preferences.RequestedLatency;//(int)comboBoxLatency.SelectedItem;
-            waveOut = SelectedOutputDevicePlugin.CreateDevice(latency);
-            waveOut.PlaybackStopped += OnPlaybackStopped;
+            m_WaveOut = m_SelectedOutputDevicePlugin.CreateDevice(latency);
+            m_WaveOut.PlaybackStopped += OnPlaybackStopped;
         }
 
-        void OnPlaybackStopped(object sender, StoppedEventArgs e)
+        private void OnPlaybackStopped(object sender, StoppedEventArgs e)
         {
             //groupBoxDriverModel.Enabled = true;
             if (e.Exception != null)
             {
                 MessageBox.Show(e.Exception.Message, "Playback Device Error");
             }
-            if (audioFileReader != null)
+            if (m_AudioFileReader != null)
             {
-                audioFileReader.Position = 0;
+                m_AudioFileReader.Position = 0;
             }
 
             ButtonPauseCommand.Visibility = System.Windows.Visibility.Collapsed;
             ButtonPlayCommand.Visibility = System.Windows.Visibility.Visible;
-            if (m_FadeInOutSampleProvider != null)
+            if (FadeInOutSampleProvider != null)
             {
                 ButtonPlay1Command.Visibility = System.Windows.Visibility.Collapsed;
                 ButtonPause1Command.Visibility = System.Windows.Visibility.Collapsed;
             }
 
-            dispatcherTimer.Stop();
+            m_DispatcherTimer.Stop();
 
             SliderSeek.Value = ProgressBarPosition.Value = 0;
         }
 
         public void CloseWaveOut()
         {
-            if (waveOut != null)
+            if (m_WaveOut != null)
             {
-                waveOut.Stop();
+                m_WaveOut.Stop();
             }
-            if (audioFileReader != null)
+            if (m_AudioFileReader != null)
             {
                 // this one really closes the file and ACM conversion
-                audioFileReader.Dispose();
+                m_AudioFileReader.Dispose();
                 InvokeSetVolumeDelegate = null;
-                audioFileReader = null;
+                m_AudioFileReader = null;
             }
-            if (waveOut != null)
+            if (m_WaveOut != null)
             {
-                waveOut.Dispose();
-                waveOut = null;
+                m_WaveOut.Dispose();
+                m_WaveOut = null;
             }
         }
 
         private void SeekToCurrentPosition()
         {
-            audioFileReader.CurrentTime = TimeSpan.FromSeconds(audioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
+            m_AudioFileReader.CurrentTime = TimeSpan.FromSeconds(m_AudioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
         }
 
         private void ButtonPlayCommand_Click(object sender, RoutedEventArgs e)
@@ -825,15 +825,15 @@ namespace ShowComposer.UserControls
 
             SeekToCurrentPosition();
 
-            if (this.m_FadeInOutSampleProvider != null && !(audioFileReader is FlacReader))
+            if (this.FadeInOutSampleProvider != null && !(m_AudioFileReader is FlacReader))
             {
-                this.m_FadeInOutSampleProvider.BeginFadeIn(100);
+                this.FadeInOutSampleProvider.BeginFadeIn(100);
             }
             
             
             ButtonPlayCommand.Visibility = System.Windows.Visibility.Collapsed;
             ButtonPauseCommand.Visibility = System.Windows.Visibility.Visible;
-            if (m_FadeInOutSampleProvider != null && !(audioFileReader is FlacReader))
+            if (FadeInOutSampleProvider != null && !(m_AudioFileReader is FlacReader))
             {
                 ButtonPlay1Command.Visibility = System.Windows.Visibility.Collapsed;
                 ButtonPause1Command.Visibility = System.Windows.Visibility.Visible;
@@ -848,17 +848,17 @@ namespace ShowComposer.UserControls
             
             ButtonPauseCommand.Visibility = System.Windows.Visibility.Collapsed;
             ButtonPlayCommand.Visibility = System.Windows.Visibility.Visible;
-            if (m_FadeInOutSampleProvider != null && !(audioFileReader is FlacReader))
+            if (FadeInOutSampleProvider != null && !(m_AudioFileReader is FlacReader))
             {
                 ButtonPlay1Command.Visibility = System.Windows.Visibility.Visible;
                 ButtonPause1Command.Visibility = System.Windows.Visibility.Collapsed;
             }
 
-            if (waveOut != null)
+            if (m_WaveOut != null)
             {
-                if (waveOut.PlaybackState == PlaybackState.Playing)
+                if (m_WaveOut.PlaybackState == PlaybackState.Playing)
                 {
-                    waveOut.Pause();
+                    m_WaveOut.Pause();
                 }
             }
         }
@@ -869,15 +869,15 @@ namespace ShowComposer.UserControls
 
             ButtonPlayCommand.Visibility = System.Windows.Visibility.Collapsed;
             ButtonPauseCommand.Visibility = System.Windows.Visibility.Visible;
-            if (m_FadeInOutSampleProvider != null && !(audioFileReader is FlacReader))
+            if (FadeInOutSampleProvider != null && !(m_AudioFileReader is FlacReader))
             {
                 ButtonPlay1Command.Visibility = System.Windows.Visibility.Collapsed;
                 ButtonPause1Command.Visibility = System.Windows.Visibility.Visible;
             }
 
-            if (this.m_FadeInOutSampleProvider != null && !(audioFileReader is FlacReader))
+            if (this.FadeInOutSampleProvider != null && !(m_AudioFileReader is FlacReader))
             {
-                this.m_FadeInOutSampleProvider.BeginFadeIn(2000);
+                this.FadeInOutSampleProvider.BeginFadeIn(2000);
             }
 
             if (OnPlay != null)
@@ -888,22 +888,22 @@ namespace ShowComposer.UserControls
         {
             ButtonPauseCommand.Visibility = System.Windows.Visibility.Visible;
             ButtonPlayCommand.Visibility = System.Windows.Visibility.Collapsed;
-            if (m_FadeInOutSampleProvider != null && !(audioFileReader is FlacReader))
+            if (FadeInOutSampleProvider != null && !(m_AudioFileReader is FlacReader))
             {
                 ButtonPlay1Command.Visibility = System.Windows.Visibility.Visible;
                 ButtonPause1Command.Visibility = System.Windows.Visibility.Collapsed;
             }
 
-            if (waveOut != null)
+            if (m_WaveOut != null)
             {
-                if (waveOut.PlaybackState == PlaybackState.Playing)
+                if (m_WaveOut.PlaybackState == PlaybackState.Playing)
                 {
-                    if (this.m_FadeInOutSampleProvider != null)
+                    if (this.FadeInOutSampleProvider != null)
                     {
-                        this.m_FadeInOutSampleProvider.BeginFadeOut(1600);
+                        this.FadeInOutSampleProvider.BeginFadeOut(1600);
                     }
                     else
-                        waveOut.Pause();
+                        m_WaveOut.Pause();
                 }
             }
         }
@@ -995,12 +995,12 @@ namespace ShowComposer.UserControls
 
         private void SliderSeek_ThumbDragCompleted(object sender, DragCompletedEventArgs e)
         {
-            if (waveOut != null)
+            if (m_WaveOut != null)
             {
-                audioFileReader.CurrentTime = TimeSpan.FromSeconds(audioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
+                m_AudioFileReader.CurrentTime = TimeSpan.FromSeconds(m_AudioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
             }
 
-            sliderSeekdragStarted = false;
+            m_SliderSeekdragStarted = false;
         }
 
         private void SliderSeek_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -1009,9 +1009,9 @@ namespace ShowComposer.UserControls
             if (e.ChangedButton != MouseButton.Left)
                 return;
 
-            if (waveOut == null) return;
+            if (m_WaveOut == null) return;
 
-            if (DateTime.Now - sliderSeekMouseDownStart > TimeSpan.FromMilliseconds(300))
+            if (DateTime.Now - m_SliderSeekMouseDownStart > TimeSpan.FromMilliseconds(300))
                 SliderSeek_ThumbDragCompleted(null, null);
             else
             {
@@ -1020,9 +1020,9 @@ namespace ShowComposer.UserControls
 
                 SliderSeek.Value = SmoothStep(pos.X, 0, SliderSeek.ActualWidth, SliderSeek.Minimum, SliderSeek.Maximum);
 
-                audioFileReader.CurrentTime = TimeSpan.FromSeconds(audioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
+                m_AudioFileReader.CurrentTime = TimeSpan.FromSeconds(m_AudioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
 
-                sliderSeekdragStarted = false;
+                m_SliderSeekdragStarted = false;
             }
         }
 
@@ -1031,20 +1031,20 @@ namespace ShowComposer.UserControls
             if (e.ChangedButton != MouseButton.Left)
                 return;
 
-            sliderSeekMouseDownStart = DateTime.Now;
-            sliderSeekdragStarted = true;
+            m_SliderSeekMouseDownStart = DateTime.Now;
+            m_SliderSeekdragStarted = true;
         }
 
         private void SliderSeek_ThumbDragStarted(object sender, DragStartedEventArgs e)
         {
-            sliderSeekdragStarted = true;
+            m_SliderSeekdragStarted = true;
         }
 
         private void SliderSeek_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (waveOut != null && sliderSeekdragStarted)
+            if (m_WaveOut != null && m_SliderSeekdragStarted)
             {
-                audioFileReader.CurrentTime = TimeSpan.FromSeconds(audioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
+                m_AudioFileReader.CurrentTime = TimeSpan.FromSeconds(m_AudioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
             }
             ProgressBarPosition.Value = SliderSeek.Value;
         }
@@ -1111,7 +1111,7 @@ namespace ShowComposer.UserControls
             }
         }
 
-        public FadeInOutSampleProvider m_FadeInOutSampleProvider { get; set; }
+        public FadeInOutSampleProvider FadeInOutSampleProvider { get; set; }
 
         public double SoundVolume { get { return SliderVolume.Value; } set { SliderVolume.Value = value; ProgressBarVolume.Value = value; } }
 

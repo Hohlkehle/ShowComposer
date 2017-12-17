@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ShowComposer.Windows"
         mc:Ignorable="d"
-        Title="LoggingWindow" Height="210" Width="507.429">
+        Title="LoggingWindow" Height="210" Width="507.429" Icon="/ShowComposer;component/Images/Programming-Console-icon.png">
     <Grid>
         <RichTextBox x:Name="RichTextBox1" Background="#FF131313" Foreground="Silver" FontWeight="Bold" FontFamily="Consolas" FontSize="11" Block.LineHeight="6">
             <FlowDocument>
                 <Paragraph>
-                    <Run Text="ShowComposer version 1.2"/>
+                    <Run Text=""/>
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>

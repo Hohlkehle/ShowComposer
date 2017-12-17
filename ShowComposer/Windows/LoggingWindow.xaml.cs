@@ -26,11 +26,15 @@ namespace ShowComposer.Windows
             instance = this;
             InitializeComponent();
             Initialize();
-            Log("\n---------------------------------------");
+            
         }
 
         private void Initialize()
         {
+            var asName = typeof(MainWindow).Assembly.GetName();
+            Log(String.Format("{0} v{1}b", asName.Name, asName.Version));
+            Log("---------------------------------------");
+
             MainWindow.OnApplicationQuit += (object sender, EventArgs e) =>
             {
                 Quit();

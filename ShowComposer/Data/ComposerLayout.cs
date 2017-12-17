@@ -21,7 +21,7 @@ namespace ShowComposer.Data
 
         public LayoutProperties RearSideLayout { get; set; }
 
-        public bool m_IsLoading { get; set; }
+        public bool IsLoading { get; set; }
 
         public bool IsChanged { get; set; }
 
@@ -72,10 +72,10 @@ namespace ShowComposer.Data
         {
             m_FileName = fileName;
 
-            if (m_IsLoading)
+            if (IsLoading)
                 return;
 
-            m_IsLoading = true;
+            IsLoading = true;
 
             Task.Factory.StartNew(new Action(() =>
             {
@@ -99,7 +99,7 @@ namespace ShowComposer.Data
             catch (FileLoadException)
             {
                 MessageBox.Show("Layout file " + m_FileName + " cannot be loaded!", "Supplement Processor", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                m_IsLoading = false;
+                IsLoading = false;
                 return;
             }
 
@@ -109,7 +109,7 @@ namespace ShowComposer.Data
             //FrontSideLayout.BackgroundImage = m_Layout.Data3;
             //RearSideLayout.BackgroundImage = m_Layout.Data4;
 
-            m_IsLoading = false;
+            IsLoading = false;
 
             if (OnSupplementLayoutLoaded != null)
                 OnSupplementLayoutLoaded(this, EventArgs.Empty);
@@ -145,7 +145,7 @@ namespace ShowComposer.Data
             IsChanged = false;
         }
 
-        string SerializeToString(LayoutProperties prop)
+        private string SerializeToString(LayoutProperties prop)
         {
             if (prop == null)
                 throw new InvalidOperationException();

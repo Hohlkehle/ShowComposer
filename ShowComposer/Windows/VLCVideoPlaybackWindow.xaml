@@ -7,7 +7,7 @@
         xmlns:wpf="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf"
         mc:Ignorable="d"
         Title="VideoPlaybackWindow" Height="480" Width="720" KeyUp="MainWindow_KeyUp" KeyDown="MainWindow_KeyDown"
-        WindowStyle="None" BorderThickness="0,0,0,0" AllowsTransparency="False" ResizeMode="CanResizeWithGrip" Unloaded="Window_Unloaded" SizeChanged="Window_SizeChanged" Icon="/ShowComposer;component/Images/very-basic-video-file-icon.png" Closed="Window_Closed">
+        WindowStyle="None" BorderThickness="0,0,0,0" AllowsTransparency="False" ResizeMode="CanResizeWithGrip" Unloaded="Window_Unloaded" SizeChanged="Window_SizeChanged" Icon="/ShowComposer;component/Images/Whack-VLC-Player-icon.png" Closed="Window_Closed">
     <Window.Resources>
         <!--Control colors.-->
         <Color x:Key="WindowColor">#FFE8EDF9</Color>

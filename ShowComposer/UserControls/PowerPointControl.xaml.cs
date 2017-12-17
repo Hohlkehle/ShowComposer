@@ -27,7 +27,7 @@ namespace ShowComposer.UserControls
         public static event EventHandler OnPlay;
         public event EventHandler OnRemove;
 
-        private DispatcherTimer dispatcherTimer;
+        private DispatcherTimer m_DispatcherTimer;
 
         private string m_PresenterFile;
         //private VideoPlaybackWindow m_VideoPlaybackWindow;
@@ -72,9 +72,9 @@ namespace ShowComposer.UserControls
 
             InitializeComponent();
 
-            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
+            m_DispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            m_DispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
+            m_DispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
 
             MainWindow.OnUIElementSelected += MainWindow_OnUIElementSelected;
         }
@@ -103,14 +103,12 @@ namespace ShowComposer.UserControls
                 BorderContour.Visibility = System.Windows.Visibility.Hidden;
         }
 
-        void MainWindow_OnUIElementSelected(object sender, LayoutEditorSelectionEventArgs e)
+        private void MainWindow_OnUIElementSelected(object sender, LayoutEditorSelectionEventArgs e)
         {
             if (this.Equals(e.UIElement) || (e.UIElement == null && !e.IsSelected))
                 BorderContour.Visibility = e.IsSelected ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
         }
-
-
-
+        
         #region Playback
         public void Play()
         {
@@ -149,7 +147,7 @@ namespace ShowComposer.UserControls
 
                 //System.Diagnostics.Process.Start(PresenterFile, "/s");
 
-                dispatcherTimer.Start();
+                m_DispatcherTimer.Start();
             }
             catch (Exception initException)
             {
@@ -164,16 +162,16 @@ namespace ShowComposer.UserControls
              }));*/
         }
 
-        void mePlayer_MediaEnded(object sender, RoutedEventArgs e)
+        private void Player_MediaEnded(object sender, RoutedEventArgs e)
         {
             ButtonPauseCommand.Visibility = System.Windows.Visibility.Collapsed;
             ButtonPlayCommand.Visibility = System.Windows.Visibility.Visible;
 
 
-            dispatcherTimer.Stop();
+            m_DispatcherTimer.Stop();
         }
 
-        void m_VideoPlaybackWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void VideoPlaybackWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             ButtonStopCommand_Click(null, null);
         }
@@ -192,7 +190,7 @@ namespace ShowComposer.UserControls
 
         #endregion
 
-        void OnPlaybackStopped(object sender, EventArgs e)
+        private void OnPlaybackStopped(object sender, EventArgs e)
         {
 
 
@@ -224,7 +222,7 @@ namespace ShowComposer.UserControls
             ButtonPlayCommand.Visibility = System.Windows.Visibility.Visible;
 
 
-            dispatcherTimer.Stop();
+            m_DispatcherTimer.Stop();
         }
 
         private void OnOpenFileClick(object sender, EventArgs e)
@@ -239,7 +237,7 @@ namespace ShowComposer.UserControls
             }
         }
 
-        private void myGrid_DragEnter(object sender, DragEventArgs e)
+        private void Grid_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 e.Effects = DragDropEffects.Copy; // Okay
@@ -247,10 +245,10 @@ namespace ShowComposer.UserControls
                 e.Effects = DragDropEffects.None; // Unknown data, ignore it
         }
 
-        private void myGrid_DragLeave(object sender, DragEventArgs e)
+        private void Grid_DragLeave(object sender, DragEventArgs e)
         { }
 
-        private void myGrid_Drop(object sender, DragEventArgs e)
+        private void Grid_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {

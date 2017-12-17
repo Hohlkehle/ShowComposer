@@ -46,15 +46,19 @@ namespace ShowComposer.UserControls
         //private Layout m_Layout;
         //private string m_FileName = @"scenario 1.scomp";
         private List<UIElement> m_LoadedCanvasItems = new List<UIElement>();
-        public LayoutProperties LayoutProperties;
+        
         //private bool m_IsNewProject;
         private ComposerLayout m_ComposerLayout;
+        private double m_ExpandedHeight;
+
+        public LayoutProperties LayoutProperties;
 
         public ComposerLayout ComposerLayout
         {
             get { return m_ComposerLayout; }
             set { m_ComposerLayout = value; }
         }
+
         public bool IsCtrlDown
         {
             //TODO
@@ -77,8 +81,7 @@ namespace ShowComposer.UserControls
                 //else if (Mouse.OverrideCursor == Cursors.SizeAll) Mouse.OverrideCursor = Cursors.Arrow;
             }
         }
-
-        double m_ExpandedHeight;
+        
         public double ExpandedHeight
         {
             set
@@ -100,13 +103,12 @@ namespace ShowComposer.UserControls
         }
 
         #region Drag elements on canvas
-
         /// <summary>
         /// Handler for drag stopping on leaving the window
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Window1_MouseLeave(object sender, MouseEventArgs e)
+        private void Window_MouseLeave(object sender, MouseEventArgs e)
         {
             StopDragging();
             //e.Handled = true;
@@ -117,7 +119,7 @@ namespace ShowComposer.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void DragFinishedMouseHandler(object sender, MouseButtonEventArgs e)
+        private void DragFinishedMouseHandler(object sender, MouseButtonEventArgs e)
         {
             var thr = m_StartPoint - Mouse.GetPosition(myCanvas);
             if (Math.Sqrt(thr.X * thr.X + thr.Y * thr.Y) < m_DragDelta)
@@ -146,7 +148,7 @@ namespace ShowComposer.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Window1_MouseMove(object sender, MouseEventArgs e)
+        private void Window_MouseMove(object sender, MouseEventArgs e)
         {
             if (m_IsDown)
             {
@@ -194,7 +196,7 @@ namespace ShowComposer.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Window1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (m_IsSelected)
             {
@@ -212,7 +214,7 @@ namespace ShowComposer.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void MyCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void MyCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.OriginalSource is System.Windows.Shapes.Ellipse)
                 return;
@@ -301,10 +303,10 @@ namespace ShowComposer.UserControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            this.MouseLeftButtonDown += new MouseButtonEventHandler(Window1_MouseLeftButtonDown);
+            this.MouseLeftButtonDown += new MouseButtonEventHandler(Window_MouseLeftButtonDown);
             this.MouseLeftButtonUp += new MouseButtonEventHandler(DragFinishedMouseHandler);
-            this.MouseMove += new MouseEventHandler(Window1_MouseMove);
-            this.MouseLeave += new MouseEventHandler(Window1_MouseLeave);
+            this.MouseMove += new MouseEventHandler(Window_MouseMove);
+            this.MouseLeave += new MouseEventHandler(Window_MouseLeave);
 
             myCanvas.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(MyCanvas_PreviewMouseLeftButtonDown);
             myCanvas.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(DragFinishedMouseHandler);
@@ -316,7 +318,6 @@ namespace ShowComposer.UserControls
         }
 
         #region Drag&Drop
-
         private void MyCanvas_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -380,7 +381,7 @@ namespace ShowComposer.UserControls
         #endregion
 
         #region Layout
-        void AudioPlaybackControl_OnRemove(object sender, EventArgs e)
+        private void AudioPlaybackControl_OnRemove(object sender, EventArgs e)
         {
             RemoveCanvasElement((UIElement)sender);
         }
@@ -390,7 +391,7 @@ namespace ShowComposer.UserControls
             RemoveCanvasElement((UIElement)sender);
         }
 
-        void DeskLayout_OnRemove(object sender, EventArgs e)
+        private void DeskLayout_OnRemove(object sender, EventArgs e)
         {
             RemoveCanvasElement((UIElement)sender);
         }
@@ -410,7 +411,6 @@ namespace ShowComposer.UserControls
 
             AddCanvasElement(control, new WindowsPoint());
         }
-
      
         private void AddAudioPlaybackControl(AudioPlayerInfo info)
         {
@@ -649,7 +649,6 @@ namespace ShowComposer.UserControls
         }
 
         #region Helpers
-       
         private childItem FindVisualChild<childItem>(DependencyObject obj) where childItem : DependencyObject
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
@@ -671,7 +670,6 @@ namespace ShowComposer.UserControls
             return null;
         }
 
-        
         public static bool IsAcceptableFile(string filePath)
         {
             return System.IO.File.Exists(filePath) && (IsAudioFile(filePath) || IsVideoFile(filePath) || IsPresenterFile(filePath));
@@ -710,7 +708,7 @@ namespace ShowComposer.UserControls
             RemoveCanvasElement(selectedElement);
         }
 
-        private void myCanvas_Loaded(object sender, RoutedEventArgs e)
+        private void Canvas_Loaded(object sender, RoutedEventArgs e)
         {
             //OnDeskLayoutLoaded(this, new DeskLayoutEventArgs(null) { UIElementEventType = UIElementEventType.Loaded });
         }

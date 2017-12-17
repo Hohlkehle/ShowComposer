@@ -246,7 +246,7 @@ namespace ShowComposer.Windows
             }
         }
 
-        void Timer_Tick(object sender, EventArgs e)
+        private void Timer_Tick(object sender, EventArgs e)
         {
             if (MyControl.MediaPlayer != null && VideoFile != null)
             {
