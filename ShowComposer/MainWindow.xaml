@@ -209,9 +209,13 @@
 
             </StackPanel>
             <WPFSoundVisualizationLib:SpectrumAnalyzer x:Name="spectrumAnalyzer" Visibility="Visible"
-                                                   Margin="371,0,0,0" BarCount="55" PeakFallDelay="5" BarSpacing="1"
-                                                   MaximumFrequency="16000" MinimumFrequency="200" IsFrequencyScaleLinear="True" 
-                                                       AveragePeaks="True" Grid.Column="1" Grid.RowSpan="2"/>
+                                                   Margin="371,-8,28,0" BarCount="90" PeakFallDelay="5" BarSpacing="1"
+                                                   MaximumFrequency="22050" MinimumFrequency="20" IsFrequencyScaleLinear="False" 
+                                                       AveragePeaks="False" Grid.Column="1" Grid.RowSpan="2"/>
+            <WPFSoundVisualizationLib:SpectrumAnalyzer x:Name="spectrumAnalyzer2" Visibility="Collapsed"
+                                                   Margin="0,11,778,-549" BarCount="2" PeakFallDelay="5" BarSpacing="1"
+                                                   MaximumFrequency="12000" MinimumFrequency="10000" IsFrequencyScaleLinear="False" 
+                                                       AveragePeaks="False" Grid.Row="1" Grid.ColumnSpan="2"/>
             <Border BorderBrush="#FF3399FF" BorderThickness="0,0,0,1" Grid.Row="1" Margin="-10,0,-10,0" Grid.ColumnSpan="2"/>
         </Grid>
 

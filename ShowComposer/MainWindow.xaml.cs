@@ -153,6 +153,7 @@ namespace ShowComposer
                     if (sender is ISpectrumPlayer)
                     {
                         spectrumAnalyzer.RegisterSoundPlayer((ISpectrumPlayer)sender);
+                        //spectrumAnalyzer2.RegisterSoundPlayer((ISpectrumPlayer)sender);
                     }
 
                 }
