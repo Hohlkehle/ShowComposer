@@ -29,6 +29,8 @@
     <ApplicationVersion>1.3.13.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -50,6 +52,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Thegirltyler-Brand-Camp-Guitar-Music.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DocxToFlowDocumentConverter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -73,9 +78,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite">
-      <HintPath>libs\System.Data.SQLite.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="System.Data.SQLite, Version=1.0.106.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.106.0\lib\net451\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -106,6 +110,9 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="WPFSoundVisualizationLib">
+      <HintPath>libs\WPFSoundVisualizationLib.dll</HintPath>
+    </Reference>
     <Reference Include="Xceed.Wpf.Toolkit">
       <HintPath>libs\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
@@ -126,6 +133,7 @@
     <Compile Include="Data\LayoutFileReader.cs" />
     <Compile Include="Data\PowerPointInfo.cs" />
     <Compile Include="Data\Preferences.cs" />
+    <Compile Include="Data\SampleAggregator.cs" />
     <Compile Include="Data\ScreenHandler.cs" />
     <Compile Include="Data\SQLiteHelper.cs" />
     <Compile Include="Data\VideoPlayerInfo.cs" />
@@ -351,10 +359,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+
     <None Include="error.docx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -467,6 +472,7 @@
     <Resource Include="Images\Media-winamp-icon.png" />
     <Resource Include="Images\Media-wmp-icon.png" />
     <Resource Include="Images\Whack-VLC-Player-icon.png" />
+    <Resource Include="Thegirltyler-Brand-Camp-Guitar-Music.ico" />
     <Content Include="ThirdParty\7za.exe" />
     <Content Include="ThirdParty\scfmm.exe" />
   </ItemGroup>
@@ -479,6 +485,13 @@ IF NOT EXIST $(OutDir)\winamp $(ProjectDir)\ThirdParty\7za.exe x -o"$(TargetDir)
 xcopy $(ProjectDir)\ThirdParty\scfmm.exe $(OutDir) /u /y
 xcopy $(ProjectDir)\ThirdParty\settings.ini $(OutDir) /u /y</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

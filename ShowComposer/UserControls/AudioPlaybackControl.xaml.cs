@@ -15,16 +15,19 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using WPFSoundVisualizationLib;
 
 namespace ShowComposer.UserControls
 {
     /// <summary>
     /// Interaction logic for AudioPlaybackControl.xaml
     /// </summary>
-    public partial class AudioPlaybackControl : UserControl, IDraggableUIElement
+    public partial class AudioPlaybackControl : UserControl, IDraggableUIElement, ISpectrumPlayer
     {
         public static event EventHandler OnTryPlay, OnPlay, OnStop;
         public event EventHandler OnRemove;
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private IWavePlayer m_WaveOut;
         private string m_AudioFile = null;
         private WaveStream m_AudioFileReader;
@@ -356,7 +359,7 @@ namespace ShowComposer.UserControls
                 return;
             }
 
-            ISampleProvider sampleProvider = null;
+            sampleProvider = null;
             try
             {
                 sampleProvider = CreateInputStream(AudioFile);
@@ -385,6 +388,8 @@ namespace ShowComposer.UserControls
             System.Threading.Tasks.Task.Factory.StartNew(new Action(() =>
             {
                 m_WaveOut.Play();
+                sampleAggregator = new SampleAggregator(fftDataSize);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsPlaying"));
             }));
 
             //try
@@ -455,20 +460,30 @@ namespace ShowComposer.UserControls
 
         private ISampleProvider CreateInputStream(string fileName)
         {
+            
+
             if (System.IO.Path.GetExtension(fileName).ToUpper() == ".FLAC")
             {
-                this.m_AudioFileReader = new FlacReader(fileName);
+                m_AudioFileReader = new FlacReader(fileName);
             }
             else
-                this.m_AudioFileReader = new AudioFileReader(fileName);
+                m_AudioFileReader = new AudioFileReader(fileName);
 
+            var inputStream = new WaveChannel32(m_AudioFileReader);
+            inputStream.Sample += (object sender, SampleEventArgs e) => {
+                sampleAggregator.Add(e.Left, e.Right);
+            };
+
+            var mixOut = new MixingSampleProvider(inputStream.WaveFormat);
+            mixOut.AddMixerInput(inputStream);
             if (!(m_AudioFileReader is FlacReader))
             {
-                FadeInOutSampleProvider = new FadeInOutSampleProvider((ISampleProvider)m_AudioFileReader, false);
-
+                FadeInOutSampleProvider = new FadeInOutSampleProvider((ISampleProvider)mixOut, false);
             }
+            
+            //var waveProvider = new MultiplexingSampleProvider(new ISampleProvider[] { sampleProvider, inputStream }, 4));
 
-            var sampleChannel = new SampleChannel(m_AudioFileReader, true);
+            var sampleChannel = new SampleChannel(inputStream, true);
             sampleChannel.PreVolumeMeter += OnPreVolumeMeter;
             this.InvokeSetVolumeDelegate = (vol) =>
             {
@@ -1153,6 +1168,27 @@ namespace ShowComposer.UserControls
                 Verb = "open"
             });
         }
+
+        #region ISpectrumPlayer
+        ISampleProvider sampleProvider = null;
+        private SampleAggregator sampleAggregator;
+        public bool GetFFTData(float[] fftDataBuffer)
+        {
+            sampleAggregator.GetFFTResults(fftDataBuffer);
+            return IsPlaying;
+        }
+
+        private readonly int fftDataSize = (int)FFTDataSize.FFT2048;
+        public int GetFFTFrequencyIndex(int frequency)
+        {
+            double maxFrequency;
+            if (sampleProvider != null)
+                maxFrequency = sampleProvider.WaveFormat.SampleRate / 2.0d;
+            else
+                maxFrequency = 22050; // Assume a default 44.1 kHz sample rate.
+            return (int)((frequency / maxFrequency) * (fftDataSize / 2));
+        } 
+        #endregion
     }
 
     class DelegateCommand : ICommand

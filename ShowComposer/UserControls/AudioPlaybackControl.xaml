@@ -586,6 +586,7 @@
                 <SolidColorBrush Color="Black" Opacity="0.3"/>
             </UserControls:MarqueeText.Background>
         </UserControls:MarqueeText>-->
+        
         <TextBlock x:Name="TextBlockTrackTitle" Visibility="Visible" HorizontalAlignment="Left" Margin="87,15,-395,-2" Text="16. Marina ок The Diamonds - Primadonna" VerticalAlignment="Top" Height="14" Width="338" FontWeight="Bold" FontSize="12.5" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Padding="0" Cursor="SizeAll" >
             <TextBlock.Background>
                 <SolidColorBrush Color="White" Opacity="0.85"/>

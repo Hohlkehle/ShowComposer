@@ -21,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Xps.Packaging;
 using System.Xml.Serialization;
 using Utilities;
+using WPFSoundVisualizationLib;
 using SysIO = System.IO;
 
 namespace ShowComposer
@@ -102,8 +103,8 @@ namespace ShowComposer
         {
             InitializeComponent();
             Initialize();
-            
-            
+
+
             IniFileInit();
             LoadPreferences();
 
@@ -119,13 +120,15 @@ namespace ShowComposer
                 if (Preferences.OutputDevice == "NullOut")
                     return;
 
+               
+
                 try
                 {
                     //MyDeskLayout.AudioControls.Where(i=>!((AudioPlaybackControl)i).IsExclusivePlayback).All((i) => i.Stop());
                 }
                 catch (Exception)
                 {
-                    
+
                 }
             };
 
@@ -142,13 +145,15 @@ namespace ShowComposer
 
                     System.Threading.Tasks.Task.Factory.StartNew(new Action(() =>
                     {
-                        Dispatcher.Invoke(delegate {
+                        Dispatcher.Invoke(delegate
+                        {
                             WaveformSeekbar1.LoadAudio(((AudioPlaybackControl)sender).AudioFile);
-
                         });
-
-                        
                     }));
+                    if (sender is ISpectrumPlayer)
+                    {
+                        spectrumAnalyzer.RegisterSoundPlayer((ISpectrumPlayer)sender);
+                    }
 
                 }
                 catch (Exception waveFormException)
@@ -240,7 +245,7 @@ namespace ShowComposer
                 }
             }
 
-            if(IsCtrlDown && e.Key == Key.O)
+            if (IsCtrlDown && e.Key == Key.O)
             {
                 MenuItemOpenProject_Click(this, null);
             }
@@ -364,7 +369,7 @@ namespace ShowComposer
         {
             var wnd = new OptionsWindow(new List<IOutputDevicePlugin>() {
                 new WasapiOutPlugin(),
-                new WaveOutPlugin(),      
+                new WaveOutPlugin(),
                 new DirectSoundOutPlugin(),
                 new NullOutPlugin()
             });
@@ -499,7 +504,7 @@ namespace ShowComposer
             else if (!BusyIndicatorSheetLoading.IsBusy)
                 BusyIndicatorSheetLoading.IsBusy = true;
         }
-        
+
         private void ReadDocx(string path)
         {
             if (!File.Exists(path))
@@ -513,7 +518,7 @@ namespace ShowComposer
                     this.Title = System.IO.Path.GetFileName(path);
                 }
         }
-        
+
         private void LoadProjectFileAsync(string p)
         {
             ProjectFileName = p;
@@ -571,7 +576,7 @@ namespace ShowComposer
             //if (OnSupplementLayoutLoaded != null)
             //    OnSupplementLayoutLoaded(this, EventArgs.Empty);
         }
-        
+
         #region Helpers
         public static bool InDesignMode()
         {
@@ -647,9 +652,9 @@ namespace ShowComposer
             // error occured, return false
             return false;
         }
-        
+
         #endregion
-        
+
         private void IniFileInit()
         {
             if (!File.Exists(m_IniPath))
@@ -682,7 +687,7 @@ namespace ShowComposer
                 Core.CommandHelper.LogNotify("Ошибка сохранения настроек. " + ex.Message);
             }
         }
-        
+
         private void ConsolidateProject()
         {
             using (new WaitCursor())
