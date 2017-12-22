@@ -156,11 +156,17 @@
                         <Image Source="Images/spacer128x128.png"/>
                     </Grid>
                 </Button>
+                <Button x:Name="ButtonBlackWindow" ToolTip="Black Window"  Margin="0,0,4,0" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="24" Height="24"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrush}}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="MenuItemBlakWindowWindow_Click">
+                    <Grid>
+                        <Image Source="Images/black_window.png"/>
+                    </Grid>
+                </Button>
                 <Button x:Name="ButtonVideoWindow" ToolTip="Open video window (Ctrl + B)"  Margin="0,0,4,0" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="24" Height="24"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrush}}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="MenuItemVideotWindow_Click">
                     <Grid>
                         <Image Source="Images/very-basic-video-file-icon.png"/>
                     </Grid>
                 </Button>
+                
                 <Button x:Name="ButtonVLCVideotWindow" ToolTip="VLC Render Window"  Margin="0,0,4,0" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="24" Height="24"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrush}}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="MenuItemVLCVideotWindow_Click">
                     <Grid>
                         <Image Source="Images/Whack-VLC-Player-icon.png"/>

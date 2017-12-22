@@ -364,6 +364,11 @@ namespace ShowComposer
         {
             var wnd = new VideoPlaybackWindow();
             wnd.Show();
+            if (ScreenHandler.AllScreens > 1)
+            {
+                wnd.ShowOnMonitor(1);
+                wnd.IsFullScreen = true;
+            }
         }
 
         private void MenuItemOptionsWindow_Click(object sender, RoutedEventArgs e)
@@ -1105,5 +1110,16 @@ namespace ShowComposer
             return eventDelegate;
         }
         #endregion
+
+        private void MenuItemBlakWindowWindow_Click(object sender, RoutedEventArgs e)
+        {
+            var wnd = new BlackScreenWindow();
+            wnd.Show();
+            if (ScreenHandler.AllScreens > 1)
+            {
+                wnd.ShowOnMonitor(1);
+                wnd.IsFullScreen = true;
+            }
+        }
     }
 }

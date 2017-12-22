@@ -224,7 +224,8 @@ namespace ShowComposer.UserControls
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + " WorkerThread_RunWorkerCompleted");
+                Core.CommandHelper.Log(ex.Message + " WorkerThread_RunWorkerCompleted");
+                //MessageBox.Show(ex.Message + " WorkerThread_RunWorkerCompleted");
             }
         }
 
@@ -355,7 +356,8 @@ namespace ShowComposer.UserControls
             }
             catch (Exception driverCreateException)
             {
-                MessageBox.Show(String.Format("driverCreateException {0}", driverCreateException.Message));
+                Core.CommandHelper.Log(String.Format("driverCreateException {0}", driverCreateException.Message));
+                //MessageBox.Show(String.Format("driverCreateException {0}", driverCreateException.Message));
                 return;
             }
 
@@ -366,7 +368,8 @@ namespace ShowComposer.UserControls
             }
             catch (Exception createException)
             {
-                MessageBox.Show(String.Format("createException {0}", createException.Message), "Error Loading File");
+                Core.CommandHelper.Log(String.Format("createException {0}", createException.Message));
+                //MessageBox.Show(String.Format("createException {0}", createException.Message), "Error Loading File");
                 return;
             }
 
@@ -379,7 +382,8 @@ namespace ShowComposer.UserControls
             }
             catch (Exception initException)
             {
-                MessageBox.Show(String.Format("initException {0}", initException.Message), "Error Initializing Output");
+                Core.CommandHelper.Log(String.Format("initException {0}", initException.Message));
+                //MessageBox.Show(String.Format("initException {0}", initException.Message), "Error Initializing Output");
                 return;
             }
 
@@ -829,7 +833,8 @@ namespace ShowComposer.UserControls
 
         private void SeekToCurrentPosition()
         {
-            m_AudioFileReader.CurrentTime = TimeSpan.FromSeconds(m_AudioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
+            if(m_AudioFileReader != null)
+                m_AudioFileReader.CurrentTime = TimeSpan.FromSeconds(m_AudioFileReader.TotalTime.TotalSeconds * SliderSeek.Value / 100.0);
         }
 
         private void ButtonPlayCommand_Click(object sender, RoutedEventArgs e)
@@ -1157,7 +1162,8 @@ namespace ShowComposer.UserControls
         {
             if (!System.IO.File.Exists(AudioFile))
             {
-                System.Windows.MessageBox.Show(String.Format("systemIOException {0}", "File not found!"), "IO Error");
+                //System.Windows.MessageBox.Show(String.Format("systemIOException {0}", "File not found!"), "IO Error");
+                Core.CommandHelper.Log(String.Format("systemIOException {0}", "File not found!"));
                 return;
             }
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()

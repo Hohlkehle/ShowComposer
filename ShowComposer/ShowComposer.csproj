@@ -214,6 +214,9 @@
     <Compile Include="Windows\AudipPlaybakPropertiesWindow.xaml.cs">
       <DependentUpon>AudipPlaybakPropertiesWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\BlackScreenWindow.xaml.cs">
+      <DependentUpon>BlackScreenWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\LoggingWindow.xaml.cs">
       <DependentUpon>LoggingWindow.xaml</DependentUpon>
     </Compile>
@@ -320,6 +323,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\BlackScreenWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\LoggingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -359,7 +366,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-
     <None Include="error.docx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -473,6 +479,7 @@
     <Resource Include="Images\Media-wmp-icon.png" />
     <Resource Include="Images\Whack-VLC-Player-icon.png" />
     <Resource Include="Thegirltyler-Brand-Camp-Guitar-Music.ico" />
+    <Resource Include="Images\black_window.png" />
     <Content Include="ThirdParty\7za.exe" />
     <Content Include="ThirdParty\scfmm.exe" />
   </ItemGroup>

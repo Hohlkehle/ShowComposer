@@ -87,7 +87,16 @@ namespace ShowComposer.Windows
                 }
                 else
                 {
+                    this.Left = 0;
+                    if (ScreenHandler.AllScreens > 1)
+                        this.Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
+                    this.Top = 0;
                     this.WindowState = WindowState.Normal;
+                    if (ScreenHandler.AllScreens > 1)
+                    {
+                        Width = System.Windows.Forms.Screen.AllScreens[1].Bounds.Width /2;
+                        Height = System.Windows.Forms.Screen.AllScreens[1].Bounds.Height /2;
+                    }
                 }
                 m_IsFullScreen = value;
             }
